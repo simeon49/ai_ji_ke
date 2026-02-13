@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}AI极客{% endblock %}</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     <style>
         * {
             margin: 0;
@@ -35,7 +36,19 @@
             justify-content: space-between;
             align-items: center;
         }
-        .navbar h1 {
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+        .navbar-brand img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .navbar-brand h1 {
             color: white;
             font-size: 1.4rem;
             font-weight: 700;
@@ -388,7 +401,10 @@
 <body>
     <nav class="navbar">
         <div class="navbar-content">
-            <h1>AI极客</h1>
+            <a href="/" class="navbar-brand">
+                <img src="/static/logo.svg" alt="AI极客 Logo">
+                <h1>AI极客</h1>
+            </a>
             <div class="hamburger" id="hamburger">
                 <span></span>
                 <span></span>
