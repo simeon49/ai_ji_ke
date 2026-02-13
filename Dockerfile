@@ -31,8 +31,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # 安装 Playwright 浏览器（Chromium）
 # 注意：Playwright 浏览器体积较大，这一步可能需要一些时间
-RUN pip install --no-cache-dir playwright && \
-    playwright install chromium && \
+# 使用国内镜像源加速下载
+RUN pip install --no-cache-dir -i https://pypi.tuna.tsinghua.edu.cn/simple playwright && \
+    PLAYWRIGHT_DOWNLOAD_HOST=https://npmmirror.com/mirrors/playwright/ playwright install chromium && \
     playwright install-deps chromium
 
 # 复制项目依赖文件

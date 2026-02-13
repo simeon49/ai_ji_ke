@@ -20,9 +20,8 @@ services:
       # 课程文件将保存在主机的 ./org_courses 目录
       - ./org_courses:/app/org_courses
       
-      # 可选：持久化配置文件（用户数据、设置等）
-      # 数据将保存在 Docker Volume 中，重启后不会丢失
-      - ./data:/root/.local/share/geekbang_crawler
+      # 持久化配置文件（用户数据、设置等）
+      - ./data:/root/.local/share/geekbang-crawler
     environment:
       # 设置时区
       - TZ=Asia/Shanghai
