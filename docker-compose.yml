@@ -20,10 +20,7 @@ services:
       
       # 可选：持久化配置文件（用户数据、设置等）
       # 数据将保存在 Docker Volume 中，重启后不会丢失
-      - ai_ji_ke_data:/root/.local/share/geekbang_crawler
-      
-      # 可选：如果你有本地配置文件想挂载进去
-      # - ./config:/app/config
+      - ./data:/root/.local/share/geekbang_crawler
     environment:
       # 设置时区
       - TZ=Asia/Shanghai
