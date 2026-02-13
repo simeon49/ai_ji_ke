@@ -729,6 +729,14 @@ def _parse_course_info(course_dir: Path) -> dict:
             except Exception:
                 pass
 
+    # 优先使用本地封面图，替代外链图片
+    local_cover_jpg = course_dir / "images" / "[intro]__cover.jpg"
+    local_cover_png = course_dir / "images" / "[intro]__cover.png"
+    if local_cover_jpg.exists():
+        course_info["cover_url"] = f"/course_files/{course_dir.name}/images/[intro]__cover.jpg"
+    elif local_cover_png.exists():
+        course_info["cover_url"] = f"/course_files/{course_dir.name}/images/[intro]__cover.png"
+
     labels_info = _parse_labels_json(course_dir)
     if labels_info:
         course_info["labels"] = labels_info
