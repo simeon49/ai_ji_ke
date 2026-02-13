@@ -7,8 +7,6 @@ FROM python:3.12-slim-bookworm
 WORKDIR /app
 
 # 安装系统依赖
-# - Playwright 运行需要的依赖
-# - FFmpeg 用于音视频处理
 RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     gnupg \
@@ -29,17 +27,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
-# 安装 Playwright 浏览器（Chromium）
-# 注意：Playwright 浏览器体积较大，这一步可能需要一些时间
-# 官方源下载浏览器（国内镜像源版本不全）
-RUN pip install --no-cache-dir -i https://pypi.tuna.tsinghua.edu.cn/simple playwright && \
-    playwright install chromium && \
+RUN pip install --no-cache-dir -i https://pypi.tuna.tsinghua.edu.cn/simple playwright==1.48.0 && \
+    PLAYWRIGHT_DOWNLOAD_HOST=https://npmmirror.com/mirrors/playwright/ playwright install chromium && \
     playwright install-deps chromium
 
-# 复制项目依赖文件
+# 复制项目依赖文件并安装
 COPY pyproject.toml requirements.txt ./
-
-# 安装 Python 依赖
 RUN pip install --no-cache-dir -e .
 
 # 复制项目源码
