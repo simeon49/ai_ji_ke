@@ -65,7 +65,7 @@
 
     <form id="settings-form">
         <div class="settings-section">
-            <div class="settings-section-title">账号配置</div>
+            <div class="settings-section-title">极客平台账号配置(爬取时需要)</div>
             <div class="form-row">
                 <div class="form-group">
                     <label for="phone">手机号</label>
@@ -216,20 +216,20 @@ async function saveSettings(settings) {
 }
 
 function populateForm(settings) {
-    document.getElementById('phone').value = settings.phone || '';
-    document.getElementById('password').value = settings.password || '';
-    document.getElementById('default_output_dir').value = settings.default_output_dir || './org_courses';
-    document.getElementById('delay_min').value = settings.delay_min || 1.0;
-    document.getElementById('delay_max').value = settings.delay_max || 3.0;
-    document.getElementById('download_images').checked = settings.download_images !== false;
-    document.getElementById('download_audio').checked = settings.download_audio !== false;
-    document.getElementById('download_video').checked = settings.download_video !== false;
-    document.getElementById('compress_media').checked = settings.compress_media !== false;
-    document.getElementById('compress_video_crf').value = settings.compress_video_crf || 28;
-    document.getElementById('compress_video_preset').value = settings.compress_video_preset || 'medium';
-    document.getElementById('compress_video_max_height').value = settings.compress_video_max_height || 720;
-    document.getElementById('compress_audio_bitrate').value = settings.compress_audio_bitrate || '64k';
-    document.getElementById('compress_keep_original').checked = settings.compress_keep_original === true;
+    document.getElementById('phone').value = settings.phone ?? '';
+    document.getElementById('password').value = settings.password ?? '';
+    document.getElementById('default_output_dir').value = settings.default_output_dir ?? './org_courses';
+    document.getElementById('delay_min').value = settings.delay_min ?? 1.0;
+    document.getElementById('delay_max').value = settings.delay_max ?? 3.0;
+    document.getElementById('download_images').checked = settings.download_images ?? true;
+    document.getElementById('download_audio').checked = settings.download_audio ?? true;
+    document.getElementById('download_video').checked = settings.download_video ?? true;
+    document.getElementById('compress_media').checked = settings.compress_media ?? true;
+    document.getElementById('compress_video_crf').value = settings.compress_video_crf ?? 28;
+    document.getElementById('compress_video_preset').value = settings.compress_video_preset ?? 'medium';
+    document.getElementById('compress_video_max_height').value = settings.compress_video_max_height ?? 720;
+    document.getElementById('compress_audio_bitrate').value = settings.compress_audio_bitrate ?? '64k';
+    document.getElementById('compress_keep_original').checked = settings.compress_keep_original ?? false;
 
     const warningEl = document.getElementById('warning-container');
     if (!settings.phone || !settings.password) {

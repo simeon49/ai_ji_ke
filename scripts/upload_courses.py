@@ -3,6 +3,7 @@
 import subprocess
 import re
 import os
+import shlex
 from pathlib import Path
 from rich.console import Console
 from rich.progress import (
@@ -83,7 +84,8 @@ class CourseUploader:
 
     def upload_course(self, course_path: Path, task_id, progress: Progress) -> bool:
         course_name = course_path.name
-        remote_path = f"{self.remote_host}:{self.remote_dir}/{course_name}"
+        escaped_course_name = shlex.quote(course_name)
+        remote_path = f"{self.remote_host}:{self.remote_dir}/{escaped_course_name}"
 
         console.print(f"\n[bold blue]开始上传: {course_name}[/bold blue]")
 

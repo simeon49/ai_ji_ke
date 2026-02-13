@@ -1,6 +1,3 @@
-# 爱极客 - 极客时间课程爬虫与本地学习平台
-# 基于 Python 3.12 + Playwright + FastAPI
-
 FROM python:3.12-slim-bookworm
 
 # 设置工作目录

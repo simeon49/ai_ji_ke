@@ -1,8 +1,3 @@
-# 爱极客 - Docker Compose 配置
-# 方便一键部署和分享给他人使用
-
-version: "3.8"
-
 services:
   ai_ji_ke:
     # 优先使用已存在的镜像，不存在则自动构建
