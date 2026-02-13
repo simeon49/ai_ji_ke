@@ -163,7 +163,7 @@ class LearningProgressManager:
         if not self._progress:
             self.load()
 
-        # 标准化 lesson_id：移除 org_courses/ 前缀（如果存在）
+        assert self._progress is not None
         normalized_lesson_id = lesson_id.replace("org_courses/", "")
         self._progress.mark_lesson_completed(user_id, username, normalized_lesson_id, completion_type)
         self.save()

@@ -413,6 +413,7 @@
             <nav id="nav-menu">
                 {% if current_user %}
                 <a href="/courses">课程列表</a>
+                <a href="/my-courses">我的课程</a>
                 {% if current_user and current_user.role.value == 'admin' %}
                 <div class="dropdown">
                     <a href="javascript:void(0)">平台管理 ▾</a>

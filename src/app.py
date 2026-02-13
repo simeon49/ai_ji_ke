@@ -628,6 +628,17 @@ async def global_events(request: Request, current_user: User = require_auth()):
     return EventSourceResponse(event_generator())
 
 
+@app.get("/my-courses", response_class=HTMLResponse)
+async def my_courses_page(request: Request, current_user: User = require_auth()):
+    return templates.TemplateResponse(
+        "my_courses.html",
+        {
+            "request": request,
+            "current_user": current_user,
+        },
+    )
+
+
 @app.get("/courses", response_class=HTMLResponse)
 async def list_courses(request: Request, current_user: User = require_auth()):
     output_dirs = [
@@ -960,6 +971,49 @@ async def get_categories_by_direction_api(
     return {"categories": categories}
 
 
+@app.get("/api/my-courses")
+async def get_my_courses(current_user: User = require_auth()):
+    """获取用户学习过的课程列表，按最后学习时间排序"""
+    output_dir = Path("./org_courses")
+    if not output_dir.exists():
+        return {"courses": []}
+
+    courses_with_progress = []
+
+    for course_dir in output_dir.iterdir():
+        if not course_dir.is_dir():
+            continue
+        if course_dir.name.startswith("."):
+            continue
+
+        course_id = course_dir.name
+
+        learning_mgr = LearningProgressManager(course_id, course_dir)
+        learning_mgr.load()
+
+        if not learning_mgr.progress or current_user.id not in learning_mgr.progress.users:
+            continue
+
+        user_progress = learning_mgr.progress.users[current_user.id]
+        if not user_progress.completed_lessons:
+            continue
+
+        last_learned_at = max(
+            lc.completed_at
+            for lc in user_progress.completed_lessons.values()
+        )
+
+        course_info = _parse_course_info(course_dir)
+        course_info["last_learned_at"] = last_learned_at
+        course_info["completed_lessons_count"] = len(user_progress.completed_lessons)
+
+        courses_with_progress.append(course_info)
+
+    courses_with_progress.sort(key=lambda c: c.get("last_learned_at", ""), reverse=True)
+
+    return {"courses": courses_with_progress}
+
+
 @app.get("/courses/{course_path:path}", response_class=HTMLResponse)
 async def course_detail(request: Request, course_path: str, current_user: User = require_auth()):
     # Ensure course_path includes org_courses/ prefix
@@ -1036,6 +1090,7 @@ async def course_detail(request: Request, course_path: str, current_user: User =
             "request": request,
             "course_name": display_name,
             "course_path": course_path_for_template,
+            "course_id": course_id,
             "chapters": chapters,
             "intro_content": intro_content,
             "current_user": current_user,

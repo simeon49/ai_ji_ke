@@ -16,6 +16,25 @@
         font-size: 1.25rem;
         font-weight: 600;
     }
+    .course-meta-info {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        background: #f5f0e8;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        font-size: 0.85rem;
+    }
+    .course-id-label {
+        color: #5d4e37;
+        font-weight: 500;
+    }
+    .course-id-value {
+        color: #8b7355;
+        font-weight: 600;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    }
 </style>
 <script src="/static/marked.min.js"></script>
 {% endblock %}
@@ -27,6 +46,11 @@
     <main class="main-content">
         <div class="breadcrumb-bar">
             <a href="/courses">课程列表</a> / <span class="course-name">{{ course_name }}</span>
+        </div>
+
+        <div class="course-meta-info">
+            <span class="course-id-label">课程ID:</span>
+            <span class="course-id-value">{{ course_id }}</span>
         </div>
 
         {% if intro_content %}
