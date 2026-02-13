@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% from "_course_base.html" import shared_styles, sidebar, shared_scripts %}
+
+{% block title %}{{ course_name }} - AI极客{% endblock %}
+
+{% block extra_head %}
+{{ shared_styles() }}
+<style>
+    .intro-section {
+        padding: 0;
+        margin-bottom: 1.5rem;
+    }
+    .intro-section h3 {
+        margin-bottom: 1.25rem;
+        color: #1a1a2e;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+</style>
+<script src="/static/marked.min.js"></script>
+{% endblock %}
+
+{% block content %}
+{{ sidebar(chapters, None, course_name, course_path) }}
+
+<div class="page-layout" id="mainLayout">
+    <main class="main-content">
+        <div class="breadcrumb-bar">
+            <a href="/courses">课程列表</a> / <span class="course-name">{{ course_name }}</span>
+        </div>
+
+        {% if intro_content %}
+        <div class="intro-section">
+            <h3>课程介绍</h3>
+            <div class="rich-content" id="introContent"></div>
+        </div>
+        {% endif %}
+
+        {% if not intro_content and not chapters %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📄</div>
+            <p>该课程暂无内容</p>
+        </div>
+        {% endif %}
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+{{ shared_scripts() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 加载学习进度
+    loadLearningProgress();
+
+    {% if intro_content %}
+    const introMarkdown = {{ intro_content | tojson }};
+    const introContent = document.getElementById('introContent');
+
+    marked.setOptions({
+        breaks: true,
+        gfm: true,
+        highlight: function(code, lang) {
+            return code;
+        }
+    });
+
+    introContent.innerHTML = marked.parse(introMarkdown);
+
+    // 处理图片
+    const coursePath = '{{ course_path }}';
+    processImages(introContent, coursePath);
+    {% endif %}
+});
+
+// 加载学习进度并更新侧边栏
+async function loadLearningProgress() {
+    const coursePath = '{{ course_path }}';
+    const apiCoursePath = coursePath.startsWith('org_courses/') ? coursePath : 'org_courses/' + coursePath;
+
+    try {
+        const response = await fetch('/api/courses/' + apiCoursePath + '/learning-progress');
+        if (response.ok) {
+            const data = await response.json();
+            if (data.completed_lessons) {
+                updateSidebarWithProgress(data.completed_lessons);
+            }
+        }
+    } catch (error) {
+        console.error('Failed to load learning progress:', error);
+    }
+}
+
+// 更新侧边栏中的完成状态
+function updateSidebarWithProgress(completedLessons) {
+    const lessonItems = document.querySelectorAll('.lesson-item');
+
+    lessonItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            let lessonPath = href.replace('/course_lesson_preview/', '');
+            // 标准化：移除 org_courses/ 前缀
+            lessonPath = lessonPath.startsWith('org_courses/') ? lessonPath.replace('org_courses/', '') : lessonPath;
+
+            if (completedLessons.includes(lessonPath)) {
+                item.classList.add('completed');
+            }
+        }
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+
+{% block title %}系统设置 - AI极客{% endblock %}
+
+{% block extra_head %}
+<style>
+    .settings-section {
+        margin-bottom: 2rem;
+    }
+    .settings-section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #eee;
+    }
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    .form-hint {
+        font-size: 0.875rem;
+        color: #666;
+        margin-top: 0.25rem;
+    }
+    .alert {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+    .alert-success {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+    }
+    .alert-warning {
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        color: #856404;
+    }
+    .checkbox-inline {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0;
+    }
+    .checkbox-inline input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 class="card-title">系统设置</h2>
+
+    <div id="message-container"></div>
+
+    <div id="warning-container" class="alert alert-warning" style="display: none;">
+        请配置极客时间账号信息后才能开始爬取任务
+    </div>
+
+    <form id="settings-form">
+        <div class="settings-section">
+            <div class="settings-section-title">账号配置</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="phone">手机号</label>
+                    <input type="text" id="phone" name="phone" placeholder="极客时间登录手机号">
+                </div>
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" name="password" placeholder="极客时间登录密码">
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <div class="settings-section-title">课程目录</div>
+            <div class="form-group">
+                <label for="default_output_dir">课程目录(用于保存爬取课程以及学习使用)</label>
+                <input type="text" id="default_output_dir" name="default_output_dir">
+                <div class="form-hint">支持相对路径（相对于爬虫目录）和绝对路径</div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <div class="settings-section-title">爬取配置</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="delay_min">最小延迟（秒）</label>
+                    <input type="number" id="delay_min" name="delay_min" step="0.1" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="delay_max">最大延迟（秒）</label>
+                    <input type="number" id="delay_max" name="delay_max" step="0.1" min="0">
+                </div>
+            </div>
+            <div class="form-hint">每次请求间的随机延迟范围，避免被封</div>
+        </div>
+
+        <div class="settings-section">
+            <div class="settings-section-title">下载配置</div>
+            <div class="form-row">
+                <label class="checkbox-inline">
+                    <input type="checkbox" id="download_images" name="download_images">
+                    下载图片
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" id="download_audio" name="download_audio">
+                    下载音频
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" id="download_video" name="download_video">
+                    下载视频
+                </label>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <div class="settings-section-title">压缩配置</div>
+            <label class="checkbox-inline">
+                <input type="checkbox" id="compress_media" name="compress_media">
+                启用音视频压缩
+            </label>
+            <div class="form-row" style="margin-top: 1rem;">
+                <div class="form-group">
+                    <label for="compress_video_crf">视频压缩质量 (CRF)</label>
+                    <input type="number" id="compress_video_crf" name="compress_video_crf" min="18" max="51">
+                    <div class="form-hint">18-28，数值越大文件越小质量越低</div>
+                </div>
+                <div class="form-group">
+                    <label for="compress_video_max_height">视频最大高度</label>
+                    <input type="number" id="compress_video_max_height" name="compress_video_max_height" min="0">
+                    <div class="form-hint">0 表示不调整，常用 720/1080</div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="compress_video_preset">视频压缩预设</label>
+                    <select id="compress_video_preset" name="compress_video_preset" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 8px;">
+                        <option value="ultrafast">ultrafast（最快）</option>
+                        <option value="fast">fast</option>
+                        <option value="medium">medium（推荐）</option>
+                        <option value="slow">slow</option>
+                        <option value="veryslow">veryslow（最佳压缩）</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="compress_audio_bitrate">音频比特率</label>
+                    <input type="text" id="compress_audio_bitrate" name="compress_audio_bitrate">
+                    <div class="form-hint">例如：64k, 128k, 192k</div>
+                </div>
+            </div>
+            <label class="checkbox-inline">
+                <input type="checkbox" id="compress_keep_original" name="compress_keep_original">
+                保留原始未压缩文件
+            </label>
+        </div>
+
+        <div class="form-actions" style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+            <button type="submit" class="btn btn-primary">保存设置</button>
+            <button type="button" class="btn" onclick="resetSettings()" style="background: #6c757d; color: white;">恢复默认</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const DEFAULT_SETTINGS = {
+    phone: '',
+    password: '',
+    default_output_dir: './org_courses',
+    delay_min: 1.0,
+    delay_max: 3.0,
+    headless: true,
+    download_images: true,
+    download_audio: true,
+    download_video: true,
+    compress_media: true,
+    compress_video_crf: 28,
+    compress_video_preset: 'medium',
+    compress_video_max_height: 720,
+    compress_audio_bitrate: '64k',
+    compress_keep_original: false
+};
+
+async function loadSettings() {
+    try {
+        const response = await fetch('/api/settings');
+        if (response.ok) {
+            return await response.json();
+        }
+    } catch (e) {
+        console.error('Failed to load settings:', e);
+    }
+    return { ...DEFAULT_SETTINGS };
+}
+
+async function saveSettings(settings) {
+    try {
+        const response = await fetch('/api/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(settings)
+        });
+        return response.ok;
+    } catch (e) {
+        console.error('Failed to save settings:', e);
+        return false;
+    }
+}
+
+function populateForm(settings) {
+    document.getElementById('phone').value = settings.phone || '';
+    document.getElementById('password').value = settings.password || '';
+    document.getElementById('default_output_dir').value = settings.default_output_dir || './org_courses';
+    document.getElementById('delay_min').value = settings.delay_min || 1.0;
+    document.getElementById('delay_max').value = settings.delay_max || 3.0;
+    document.getElementById('download_images').checked = settings.download_images !== false;
+    document.getElementById('download_audio').checked = settings.download_audio !== false;
+    document.getElementById('download_video').checked = settings.download_video !== false;
+    document.getElementById('compress_media').checked = settings.compress_media !== false;
+    document.getElementById('compress_video_crf').value = settings.compress_video_crf || 28;
+    document.getElementById('compress_video_preset').value = settings.compress_video_preset || 'medium';
+    document.getElementById('compress_video_max_height').value = settings.compress_video_max_height || 720;
+    document.getElementById('compress_audio_bitrate').value = settings.compress_audio_bitrate || '64k';
+    document.getElementById('compress_keep_original').checked = settings.compress_keep_original === true;
+
+    const warningEl = document.getElementById('warning-container');
+    if (!settings.phone || !settings.password) {
+        warningEl.style.display = 'block';
+    } else {
+        warningEl.style.display = 'none';
+    }
+}
+
+function getFormData() {
+    return {
+        phone: document.getElementById('phone').value,
+        password: document.getElementById('password').value,
+        default_output_dir: document.getElementById('default_output_dir').value,
+        delay_min: parseFloat(document.getElementById('delay_min').value) || 1.0,
+        delay_max: parseFloat(document.getElementById('delay_max').value) || 3.0,
+        headless: true,
+        download_images: document.getElementById('download_images').checked,
+        download_audio: document.getElementById('download_audio').checked,
+        download_video: document.getElementById('download_video').checked,
+        compress_media: document.getElementById('compress_media').checked,
+        compress_video_crf: parseInt(document.getElementById('compress_video_crf').value) || 28,
+        compress_video_preset: document.getElementById('compress_video_preset').value,
+        compress_video_max_height: parseInt(document.getElementById('compress_video_max_height').value) || 720,
+        compress_audio_bitrate: document.getElementById('compress_audio_bitrate').value || '64k',
+        compress_keep_original: document.getElementById('compress_keep_original').checked
+    };
+}
+
+function showMessage(text, isError = false) {
+    const container = document.getElementById('message-container');
+    container.innerHTML = `<div class="alert ${isError ? 'alert-warning' : 'alert-success'}">${text}</div>`;
+    setTimeout(() => { container.innerHTML = ''; }, 3000);
+}
+
+document.addEventListener('DOMContentLoaded', async function() {
+    const settings = await loadSettings();
+    populateForm(settings);
+
+    document.getElementById('settings-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const settings = getFormData();
+
+        const saved = await saveSettings(settings);
+        if (saved) {
+            showMessage('设置已保存');
+        } else {
+            showMessage('保存设置失败', true);
+        }
+
+        populateForm(settings);
+    });
+});
+
+async function resetSettings() {
+    if (!confirm('确定要恢复默认设置吗？账号信息也会被清空！')) return;
+
+    const saved = await saveSettings(DEFAULT_SETTINGS);
+    if (saved) {
+        populateForm(DEFAULT_SETTINGS);
+        showMessage('已恢复默认设置');
+    } else {
+        showMessage('恢复默认设置失败', true);
+    }
+}
+</script>
+{% endblock %}

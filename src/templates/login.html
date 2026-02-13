@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}登录 - AI极客{% endblock %}
+
+{% block extra_head %}
+<style>
+    .auth-container {
+        max-width: 450px;
+        margin: 3rem auto;
+    }
+    .auth-card {
+        background: #fffbf5;
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        border: 1px solid #e8e0d5;
+    }
+    .auth-title {
+        text-align: center;
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 0.5rem;
+    }
+    .auth-subtitle {
+        text-align: center;
+        color: #5d4e37;
+        margin-bottom: 2rem;
+        font-size: 0.95rem;
+    }
+    .btn-block {
+        width: 100%;
+        margin-top: 1rem;
+    }
+    .auth-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #d4c5b0;
+        color: #5d4e37;
+    }
+    .auth-footer a {
+        color: #8b7355;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .auth-footer a:hover {
+        text-decoration: underline;
+    }
+    .error-message {
+        background: #fee2e2;
+        color: #b91c1c;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+        border: 1px solid #fecaca;
+    }
+    .success-message {
+        background: #d1fae5;
+        color: #047857;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+        border: 1px solid #a7f3d0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h1 class="auth-title">欢迎回来</h1>
+        <p class="auth-subtitle">登录AI极客，开始学习之旅</p>
+
+        {% if error %}
+        <div class="error-message">{{ error }}</div>
+        {% endif %}
+
+        {% if message %}
+        <div class="success-message">{{ message }}</div>
+        {% endif %}
+
+        <form method="post" action="/auth/login">
+            <div class="form-group">
+                <label for="username">邮箱</label>
+                <input type="email" id="username" name="username" required placeholder="请输入邮箱" autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" name="password" required placeholder="请输入密码（至少8位）">
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">登录</button>
+        </form>
+
+        <div class="auth-footer">
+            还没有账号？<a href="/auth/register">立即注册</a>
+            <span style="margin: 0 0.5rem;">|</span>
+            <a href="/auth/forgot-password">忘记密码</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

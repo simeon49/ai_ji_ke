@@ -1,0 +1,979 @@
+{# 课程页面共享样式和组件 #}
+
+{# ========== 共享样式 ========== #}
+{% macro shared_styles() %}
+<style>
+    /* 页面布局 */
+    .page-layout {
+        display: flex;
+        justify-content: center;
+        align-items: start;
+        min-height: calc(100vh - 4.5rem);
+        padding: 0 1rem;
+    }
+    
+    /* 侧边栏 */
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 4.5rem;
+        width: 420px;
+        height: calc(100vh - 4.5rem);
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+        transition: transform 0.3s ease;
+        z-index: 50;
+        /* padding: 1rem; */
+        box-sizing: border-box;
+    }
+    .sidebar.collapsed {
+        transform: translateX(-420px);
+    }
+    .sidebar::-webkit-scrollbar {
+        width: 6px;
+    }
+    .sidebar::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+    }
+    .sidebar-card {
+        background: #fffbf5;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1);
+        padding: 0.7rem;
+        border: 1px solid #e8e0d5;
+        height: calc(100vh - 7rem);
+        display: flex;
+        flex-direction: column;
+    }
+    .sidebar-content {
+        flex: 1;
+        overflow-y: auto;
+        min-height: 0;
+    }
+    .sidebar-header {
+    }
+    .sidebar-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1a1a2e;
+    }
+    /* 侧边栏面包屑 */
+    .sidebar-breadcrumb {
+        padding: 0.5rem 0;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #d4c5b0;
+        font-size: 1.0rem;
+        font-weight: 800;
+        line-height: 1.5;
+    }
+    .sidebar-breadcrumb a {
+        color: #8b7355;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    .sidebar-breadcrumb a:hover {
+        color: #5d4e37;
+        text-decoration: underline;
+    }
+    .sidebar-toggle {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: #e8e0d5;
+        color: #5d4e37;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+        font-size: 1rem;
+    }
+    .sidebar-toggle:hover {
+        background: #d4c5b0;
+        color: #3d2e17;
+    }
+    .sidebar-toggle-btn {
+        position: fixed;
+        left: 10px;
+        top: 5rem;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #8b7355;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: none;
+        font-size: 1.2rem;
+        z-index: 49;
+        box-shadow: 0 2px 8px rgba(139, 115, 85, 0.3);
+        opacity: 0.75;
+    }
+    .sidebar-toggle-btn:hover {
+        background: #7a6448;
+        transform: scale(1.05);
+        opacity: 1;
+    }
+    .sidebar-toggle-btn.hidden {
+        opacity: 0;
+        transform: scale(0.8);
+        pointer-events: none;
+    }
+    .sidebar-footer {
+        margin-top: auto;
+        padding-top: 1rem;
+        border-top: 1px solid #d4c5b0;
+    }
+    .sidebar-close-btn {
+        width: 100%;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 8px;
+        background: #e8e0d5;
+        color: #5d4e37;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    .sidebar-close-btn:hover {
+        background: #d4c5b0;
+        color: #3d2e17;
+    }
+    .sidebar-close-btn:active {
+        transform: scale(0.98);
+    }
+
+    /* 章节目录 */
+    .chapter {
+        /* margin-bottom: 0.42rem; */
+    }
+    .chapter-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        padding: 0.5rem 0.25rem;
+        margin-bottom: 0.25rem;
+        border-radius: 8px;
+        transition: background 0.2s;
+    }
+    .chapter-header:hover {
+        background: #e8e0d5;
+    }
+    .chapter-title {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #2c3e50;
+        flex: 1;
+    }
+    .chapter-toggle {
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        background: #e8e0d5;
+        color: #5d4e37;
+        font-size: 0.75rem;
+        transition: all 0.2s;
+    }
+    .chapter-toggle:hover {
+        background: #d4c5b0;
+        color: #3d2e17;
+    }
+    .chapter-toggle.collapsed {
+        transform: rotate(-90deg);
+    }
+    .lesson-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+        overflow: hidden;
+        transition: max-height 0.3s ease, opacity 0.3s ease;
+    }
+    .lesson-list.collapsed {
+        max-height: 0;
+        opacity: 0;
+    }
+    .lesson-item {
+        display: block;
+        padding: 0.2rem 0.2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #5d4e37;
+        font-size: 0.76rem;
+        transition: all 0.2s;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        border: 1px solid transparent;
+        margin-left: 0.2rem;
+    }
+    .lesson-item:hover {
+        background: #e8e0d5;
+        color: #1a1a2e;
+        border-color: #d4c5b0;
+    }
+    .lesson-item.active {
+        background: #8b7355;
+        color: white;
+        border-color: transparent;
+    }
+    .lesson-item.completed {
+        position: relative;
+    }
+    .lesson-item.completed:not(.active) {
+        color: #5d4e37;
+        opacity: 0.9;
+    }
+    .lesson-item.completed .completion-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+        background: #27ae60;
+        color: white;
+        border-radius: 50%;
+        font-size: 0.7rem;
+        font-weight: bold;
+        margin-left: auto;
+        margin-right: 0.25rem;
+    }
+    .lesson-item.active .completion-icon {
+        background: rgba(255,255,255,0.3);
+    }
+    
+    /* 主内容区 */
+    .main-content {
+        width: 100%;
+        max-width: 800px;
+        padding: 0 2rem;
+        box-sizing: border-box;
+    }
+    .breadcrumb-bar {
+        position: sticky;
+        top: 0;
+        background: #f7f4ed;
+        padding: 1rem 0;
+        z-index: 40;
+        border-bottom: 1px solid #e8e0d5;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+    }
+    .breadcrumb-bar .course-name {
+        color: #5d4e37;
+    }
+    .breadcrumb-bar a {
+        color: #8b7355;
+        text-decoration: none;
+    }
+    .breadcrumb-bar a:hover {
+        color: #5d4e37;
+    }
+    
+    /* 富文本内容样式 (markdown-content 和 intro-content 共用) */
+    .rich-content {
+        line-height: 1.9;
+        color: #2c3e50;
+        font-size: 1.1rem;
+        font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans SC', sans-serif;
+    }
+    .rich-content h1 {
+        font-size: 2rem;
+        margin: 2rem 0 0;
+        text-align: center;
+        /* padding-bottom: 0.75rem; */
+        /* border-bottom: 2px solid #d4c5b0; */
+        font-weight: 600;
+        color: #1a1a2e;
+        letter-spacing: -0.02em;
+    }
+    .rich-content h2 {
+        font-size: 1.6rem;
+        margin: 1.75rem 0 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #e8e0d5;
+        font-weight: 600;
+        color: #2c3e50;
+        letter-spacing: -0.01em;
+    }
+    .rich-content h3 {
+        font-size: 1.35rem;
+        margin: 1.5rem 0 0.75rem;
+        font-weight: 600;
+        color: #34495e;
+    }
+    .rich-content h4 {
+        font-size: 1.15rem;
+        margin: 1.25rem 0 0.5rem;
+        font-weight: 600;
+        color: #3d566e;
+    }
+    .rich-content p {
+        margin: 1rem 0;
+        line-height: 1.9;
+        /* text-align: justify; */
+    }
+    .rich-content pre {
+        background: #2d2d2d;
+        color: #d4d4d4;
+        padding: 1.5rem;
+        border-radius: 12px;
+        overflow-x: auto;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'Courier New', monospace;
+        font-size: 0.9rem;
+        line-height: 1.7;
+        margin: 1.5rem 0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+    .rich-content code {
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'Courier New', monospace;
+        background: #e8e0d5;
+        padding: 0.25em 0.5em;
+        border-radius: 4px;
+        font-size: 0.9em;
+        color: #c0392b;
+    }
+    .rich-content pre code {
+        background: transparent;
+        padding: 0;
+        color: inherit;
+    }
+    .rich-content img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 12px;
+        margin: 1.5rem 0;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+    }
+    .rich-content blockquote {
+        border-left: 4px solid #8b7355;
+        padding: 1.25rem 1.5rem;
+        margin: 1.25rem 0;
+        color: #4a5568;
+        background: #f5f0e8;
+        border-radius: 0 12px 12px 0;
+        font-style: italic;
+        line-height: 1.8;
+    }
+    .rich-content ul, .rich-content ol {
+        margin: 1rem 0;
+        padding-left: 2rem;
+    }
+    .rich-content li {
+        margin: 0.5rem 0;
+        line-height: 1.8;
+    }
+    .rich-content table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1.25rem 0;
+        font-size: 0.95rem;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    .rich-content th, .rich-content td {
+        border: 1px solid #d4c5b0;
+        padding: 0.875rem;
+        text-align: left;
+    }
+    .rich-content th {
+        background: #f5f0e8;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    .rich-content tr:nth-child(even) {
+        background: #faf8f3;
+    }
+    .rich-content hr {
+        border: none;
+        border-top: 2px solid #d4c5b0;
+        margin: 2rem 0;
+        opacity: 0.5;
+    }
+    .rich-content a {
+        color: #5d4e37;
+        text-decoration: none;
+        font-weight: 500;
+        border-bottom: 1px dotted #8b7355;
+        transition: all 0.2s;
+    }
+    .rich-content a:hover {
+        text-decoration: none;
+        color: #3d2e17;
+        border-bottom-style: solid;
+    }
+    .rich-content strong a {
+        border-bottom: none;
+    }
+    .rich-content strong {
+        font-weight: 600;
+        color: #1a1a2e;
+    }
+    .rich-content em {
+        font-style: italic;
+        color: #4a5568;
+    }
+    .rich-content audio {
+        width: 100%;
+        margin: 1rem 0;
+        border-radius: 8px;
+    }
+    .rich-content video {
+        width: 100%;
+        max-height: 500px;
+        margin: 1rem 0;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    /* 音频播放栏 - PC宽屏：右侧固定 */
+    .audio-player-bar {
+        position: fixed;
+        right: 1rem;
+        top: 5rem;
+        width: 280px;
+        background: #fffbf5;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        padding: 1rem;
+        border: 1px solid #e8e0d5;
+        z-index: 60;
+        display: none;
+    }
+    .audio-player-bar.visible {
+        display: block;
+    }
+    .audio-player-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #d4c5b0;
+    }
+    .audio-player-title {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #1a1a2e;
+    }
+    .audio-player-close {
+        width: 24px;
+        height: 24px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #e8e0d5;
+        color: #5d4e37;
+        cursor: pointer;
+        border: none;
+        font-size: 0.9rem;
+        line-height: 1;
+    }
+    .audio-player-close:hover {
+        background: #d4c5b0;
+    }
+    .audio-player-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    .audio-player-main-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    .audio-player-btn {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: #8b7355;
+        color: white;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+        font-size: 0.9rem;
+    }
+    .audio-player-btn:hover {
+        background: #7a6448;
+    }
+    .audio-player-btn:active {
+        transform: scale(0.95);
+    }
+    .audio-player-btn.play-pause {
+        width: 44px;
+        height: 44px;
+        font-size: 1.1rem;
+    }
+    .audio-player-progress {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    .audio-player-progress-bar {
+        width: 100%;
+        height: 6px;
+        -webkit-appearance: none;
+        appearance: none;
+        background: #e8e0d5;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+    .audio-player-progress-bar::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 14px;
+        height: 14px;
+        background: #8b7355;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .audio-player-progress-bar::-moz-range-thumb {
+        width: 14px;
+        height: 14px;
+        background: #8b7355;
+        border-radius: 50%;
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .audio-player-time {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        color: #5d4e37;
+    }
+    .audio-player-speed {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    .audio-player-speed-label {
+        font-size: 0.8rem;
+        color: #5d4e37;
+    }
+    .audio-player-speed-select {
+        padding: 0.4rem 0.6rem;
+        border-radius: 6px;
+        background: #f5f0e8;
+        color: #2c3e50;
+        border: 1px solid #d4c5b0;
+        font-size: 0.8rem;
+        cursor: pointer;
+    }
+    .audio-player-speed-select:hover {
+        background: #e8e0d5;
+    }
+    /* 浮动音频按钮 - 默认隐藏 */
+    .audio-fab {
+        display: none;
+        position: fixed;
+        right: 1rem;
+        bottom: 1rem;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: #8b7355;
+        color: white;
+        border: none;
+        box-shadow: 0 4px 12px rgba(139, 115, 85, 0.4);
+        cursor: pointer;
+        z-index: 80;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        transition: all 0.2s;
+    }
+    .audio-fab:hover {
+        background: #7a6448;
+        transform: scale(1.05);
+    }
+    .audio-fab:active {
+        transform: scale(0.95);
+    }
+    .audio-fab.visible {
+        display: flex;
+    }
+    .audio-fab.playing {
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0%, 100% { box-shadow: 0 4px 12px rgba(139, 115, 85, 0.4); }
+        50% { box-shadow: 0 4px 20px rgba(139, 115, 85, 0.6); }
+    }
+    /* 遮罩层 */
+    .audio-player-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.3);
+        z-index: 90;
+    }
+    .audio-player-overlay.visible {
+        display: block;
+    }
+    .audio-player-toggle {
+        display: none;
+    }
+    
+    /* 平板端 (769px - 1024px) - 使用浮动按钮 */
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .sidebar {
+            width: 300px;
+        }
+        .sidebar.collapsed {
+            transform: translateX(-300px);
+        }
+        .main-content {
+            max-width: 650px;
+            padding: 0 1.5rem;
+        }
+        .rich-content {
+            font-size: 1rem;
+        }
+        .rich-content h1 {
+            font-size: 1.75rem;
+        }
+        .rich-content h2 {
+            font-size: 1.4rem;
+        }
+        /* 平板端使用浮动按钮+弹窗模式 */
+        .audio-player-bar {
+            right: auto;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 320px;
+            z-index: 100;
+        }
+        .audio-player-bar.visible {
+            display: block;
+        }
+        .audio-player-bar:not(.visible) {
+            display: none;
+        }
+        .audio-fab.has-audio {
+            display: flex;
+            opacity: 0.75;
+        }
+        .audio-player-close {
+            display: flex;
+        }
+    }
+    
+    /* 手机端 (<=768px) */
+    @media (max-width: 768px) {
+        .page-layout {
+            padding: 0;
+        }
+        .main-content {
+            padding: 0 1rem;
+            max-width: 100%;
+        }
+        .sidebar {
+            width: 90%;
+            max-width: 420px;
+            top: auto;
+            height: calc(100vh - 9rem);
+            transform: translateX(-100%);
+            background: #f7f4ed;
+        }
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+        .sidebar:not(.collapsed) {
+            transform: translateX(0);
+            box-shadow: 2px 0 12px rgba(0,0,0,0.15);
+        }
+        .sidebar-card {
+            height: 100%;
+        }
+        .sidebar-toggle-btn {
+            display: flex;
+            left: 12px;
+            top: 4.5rem;
+            width: 48px;
+            height: 48px;
+            font-size: 1.4rem;
+        }
+        .sidebar-toggle-btn.hidden {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+        .sidebar-close-btn {
+            padding: 1rem;
+            font-size: 1rem;
+        }
+        .rich-content {
+            font-size: 1rem;
+            line-height: 1.8;
+        }
+        .rich-content h1 {
+            font-size: 1.5rem;
+        }
+        .rich-content h2 {
+            font-size: 1.25rem;
+        }
+        .rich-content h3 {
+            font-size: 1.1rem;
+        }
+        .rich-content pre {
+            padding: 1rem;
+            font-size: 0.85rem;
+            border-radius: 8px;
+        }
+        .rich-content blockquote {
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .breadcrumb-bar {
+            font-size: 0.8rem;
+            padding: 0.75rem 0;
+        }
+        /* 移动端音频 - 使用浮动按钮+弹窗模式 */
+        .audio-player-bar {
+            position: fixed;
+            right: auto;
+            left: 50%;
+            top: 50%;
+            bottom: auto;
+            transform: translate(-50%, -50%);
+            width: calc(100% - 2rem);
+            max-width: 340px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            padding: 1.25rem;
+            z-index: 100;
+        }
+        .audio-player-bar:not(.visible) {
+            display: none;
+        }
+        .audio-player-close {
+            display: flex;
+        }
+        .audio-fab.has-audio {
+            display: flex;
+            opacity: 0.75;
+        }
+        .audio-player-toggle {
+            display: none;
+        }
+    }
+    
+    /* 小屏手机 (<=480px) */
+    @media (max-width: 480px) {
+        .main-content {
+            padding: 0 0.75rem;
+        }
+        .rich-content {
+            font-size: 0.95rem;
+        }
+        .rich-content h1 {
+            font-size: 1.35rem;
+        }
+        .rich-content h2 {
+            font-size: 1.15rem;
+        }
+        .rich-content table {
+            font-size: 0.85rem;
+        }
+        .rich-content th, .rich-content td {
+            padding: 0.5rem;
+        }
+    }
+</style>
+{% endmacro %}
+
+{# ========== 侧边栏组件 ========== #}
+{% macro sidebar(chapters, current_lesson_path=None, course_name=None, course_path=None) %}
+<button class="sidebar-toggle-btn hidden" id="sidebarToggleBtn" onclick="toggleSidebar()">☰</button>
+
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-card">
+        <div class="sidebar-header">
+            <div class="sidebar-title">课程目录</div>
+            {% if course_name and course_path %}
+            <div class="sidebar-breadcrumb">
+                <a href="/courses">课程列表</a> / <a href="/courses/org_courses/{{ course_path }}">{{ course_name }}</a>
+            </div>
+            {% endif %}
+        </div>
+        <div class="sidebar-content">
+            {% if chapters %}
+                {% for chapter in chapters %}
+                <div class="chapter">
+                    <div class="chapter-header" onclick="toggleChapter(this)">
+                        <div class="chapter-title">{{ chapter.name }}</div>
+                        <div class="chapter-toggle collapsed">▼</div>
+                    </div>
+                    <div class="lesson-list collapsed">
+                        {% for lesson in chapter.lessons %}
+                        <a href="{{ lesson.url }}" class="lesson-item {% if lesson.is_current %}active{% endif %} {% if lesson.completed %}completed{% endif %}" title="{{ lesson.name }}">
+                            {% if lesson.completed %}
+                            <span class="completion-icon">✓</span>
+                            {% endif %}
+                            {{ lesson.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+            <div style="text-align: center; padding: 1rem; color: #94a3b8; font-size: 0.85rem;">
+                暂无内容
+            </div>
+            {% endif %}
+        </div>
+        <div class="sidebar-footer">
+            <button class="sidebar-close-btn" onclick="toggleSidebar()">收起目录</button>
+        </div>
+    </div>
+</aside>
+{% endmacro %}
+
+{# ========== 共享脚本 ========== #}
+{% macro shared_scripts() %}
+<script>
+// 章节折叠功能
+function toggleChapter(header) {
+    const toggle = header.querySelector('.chapter-toggle');
+    const lessonList = header.nextElementSibling;
+
+    if (lessonList && lessonList.classList.contains('lesson-list')) {
+        lessonList.classList.toggle('collapsed');
+        toggle.classList.toggle('collapsed');
+    }
+}
+
+// 侧边栏收缩功能
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('sidebarToggleBtn');
+    const sidebarToggle = document.querySelector('.sidebar-toggle');
+
+    sidebar.classList.toggle('collapsed');
+
+    if (sidebar.classList.contains('collapsed')) {
+        toggleBtn.classList.remove('hidden');
+        if (sidebarToggle) sidebarToggle.textContent = '▶';
+    } else {
+        toggleBtn.classList.add('hidden');
+        if (sidebarToggle) sidebarToggle.textContent = '◀';
+    }
+}
+
+function closeSidebarOnMobile() {
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('sidebarToggleBtn');
+    if (window.innerWidth <= 768 && sidebar && !sidebar.classList.contains('collapsed')) {
+        sidebar.classList.add('collapsed');
+        if (toggleBtn) toggleBtn.classList.remove('hidden');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('sidebarToggleBtn');
+    
+    if (window.innerWidth <= 768 && sidebar) {
+        sidebar.classList.add('collapsed');
+        if (toggleBtn) toggleBtn.classList.remove('hidden');
+    }
+    
+    document.addEventListener('click', function(e) {
+        if (!sidebar || window.innerWidth > 768) return;
+        
+        if (sidebar.classList.contains('collapsed')) return;
+        
+        const isClickInsideSidebar = sidebar.contains(e.target);
+        const isToggleBtn = e.target.id === 'sidebarToggleBtn' || e.target.closest('#sidebarToggleBtn');
+        const isLessonItem = e.target.classList.contains('lesson-item') || e.target.closest('.lesson-item');
+        
+        if (isLessonItem) {
+            return;
+        }
+        
+        if (!isClickInsideSidebar && !isToggleBtn) {
+            closeSidebarOnMobile();
+        }
+    });
+});
+
+// 处理图片路径
+function processImages(container, coursePath) {
+    container.querySelectorAll('img').forEach(img => {
+        const src = img.getAttribute('src');
+        if (src && !src.startsWith('http') && !src.startsWith('/')) {
+            let newSrc;
+            if (src.includes('images/')) {
+                const cleanSrc = src.replace(/^\.\.\/+/, '');
+                newSrc = '/course_files/' + coursePath + '/' + cleanSrc;
+            } else if (src.startsWith(coursePath)) {
+                newSrc = '/course_files/' + src;
+            } else {
+                newSrc = '/course_files/' + coursePath + '/images/' + src;
+            }
+            img.src = newSrc;
+            img.onerror = function() {
+                console.error('Failed to load image:', newSrc);
+                this.style.border = '2px solid red';
+                this.alt = '图片加载失败: ' + newSrc;
+            };
+        }
+    });
+}
+
+// 处理音视频链接
+function processMediaLinks(container, coursePath) {
+    container.querySelectorAll('a[href]').forEach(link => {
+        const href = link.getAttribute('href');
+        if (href && (href.endsWith('.mp3') || href.endsWith('.m4a') || href.endsWith('.wav'))) {
+            const audio = document.createElement('audio');
+            audio.controls = true;
+            audio.style.width = '100%';
+            audio.style.margin = '1rem 0';
+            if (!href.startsWith('http') && !href.startsWith('/')) {
+                const cleanHref = href.replace(/^\.\.\/+/, '');
+                audio.src = '/course_files/' + coursePath + '/' + cleanHref;
+            } else {
+                audio.src = href;
+            }
+            link.parentNode.replaceChild(audio, link);
+        }
+        else if (href && (href.endsWith('.mp4') || href.endsWith('.webm') || href.endsWith('.mov'))) {
+            const video = document.createElement('video');
+            video.controls = true;
+            video.style.width = '100%';
+            video.style.maxHeight = '500px';
+            video.style.margin = '1rem 0';
+            if (!href.startsWith('http') && !href.startsWith('/')) {
+                const cleanHref = href.replace(/^\.\.\/+/, '');
+                video.src = '/course_files/' + coursePath + '/' + cleanHref;
+            } else {
+                video.src = href;
+            }
+            link.parentNode.replaceChild(video, link);
+        }
+    });
+}
+</script>
+{% endmacro %}

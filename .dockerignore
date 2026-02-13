@@ -1,0 +1,43 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv
+venv/
+ENV/
+env/
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 测试和开发
+.pytest_cache
+.coverage
+htmlcov/
+
+# 本地数据（会在容器内重新创建）
+org_courses/
+
+# 文档
+docs/
+*.md
+!README.md
+
+# Docker 相关文件（避免递归构建）
+Dockerfile
+docker-compose.yml
+.dockerignore

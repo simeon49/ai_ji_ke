@@ -1,0 +1,372 @@
+{% extends "base.html" %}
+
+{% block title %}设置 - AI极客{% endblock %}
+
+{% block extra_head %}
+<style>
+    .settings-section {
+        margin-bottom: 2rem;
+    }
+    .settings-section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #eee;
+    }
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    .form-hint {
+        font-size: 0.875rem;
+        color: #666;
+        margin-top: 0.25rem;
+    }
+    .alert {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+    .alert-success {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+    }
+    .alert-warning {
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        color: #856404;
+    }
+    .checkbox-inline {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0;
+    }
+    .checkbox-inline input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+    }
+    .avatar-selection {
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    .avatar-option {
+        cursor: pointer;
+        border-radius: 12px;
+        padding: 0.5rem;
+        border: 2px solid #d4c5b0;
+        transition: all 0.2s;
+        text-align: center;
+    }
+    .avatar-option:hover {
+        border-color: #8b7355;
+        background: #e8e0d5;
+    }
+    .avatar-option.selected {
+        border-color: #8b7355;
+        background: #e8e0d5;
+        box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.2);
+    }
+    .avatar-option img {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+        min-width: 50px;
+        min-height: 50px;
+    }
+    /* 手机端头像显示优化 */
+    @media (max-width: 768px) {
+        .avatar-selection {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+        }
+        .avatar-option {
+            padding: 0.75rem;
+        }
+        .avatar-option img {
+            min-width: 60px;
+            min-height: 60px;
+        }
+    }
+    .avatar-option input {
+        display: none;
+    }
+    .info-display {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        padding: 0.625rem 0.875rem;
+        color: #495057;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        min-height: 40px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 class="card-title">个人设置</h2>
+
+    <div id="message-container"></div>
+
+    <div class="settings-section">
+        <div class="settings-section-title">基本信息</div>
+        <form id="profile-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="profile-nickname">昵称</label>
+                    <input type="text" id="profile-nickname" name="nickname" value="{{ current_user.nickname }}">
+                </div>
+                <div class="form-group">
+                    <label>账号(邮箱)</label>
+                    <div class="info-display">{{ current_user.username }}</div>
+                    <div class="form-hint">不可修改</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>选择头像</label>
+                <div class="avatar-selection">
+                    {% for avatar in avatars %}
+                    <label class="avatar-option {% if avatar == current_user.avatar %}selected{% endif %}" id="avatar-{{ loop.index }}">
+                        <input type="radio" name="avatar" value="{{ avatar }}" {% if avatar == current_user.avatar %}checked{% endif %}>
+                        <img src="/static/avatars/{{ avatar }}" alt="Avatar {{ loop.index }}">
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">保存个人信息</button>
+        </form>
+    </div>
+
+    <div class="settings-section">
+        <div class="settings-section-title">修改密码</div>
+        <form id="password-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="old-password">原密码</label>
+                    <input type="password" id="old-password" name="old_password" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="new-password">新密码</label>
+                    <input type="password" id="new-password" name="new_password" required minlength="8">
+                </div>
+                <div class="form-group">
+                    <label for="confirm-password">确认新密码</label>
+                    <input type="password" id="confirm-password" name="confirm_password" required minlength="8">
+                </div>
+            </div>
+            <div class="form-hint">密码长度至少8位</div>
+            <button type="submit" class="btn btn-primary" style="background: #17a2b8;">修改密码</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const DEFAULT_SETTINGS = {
+    phone: '',
+    password: '',
+    default_output_dir: './org_courses',
+    delay_min: 1.0,
+    delay_max: 3.0,
+    headless: true,
+    download_images: true,
+    download_audio: true,
+    download_video: true,
+    compress_media: true,
+    compress_video_crf: 28,
+    compress_video_preset: 'medium',
+    compress_video_max_height: 720,
+    compress_audio_bitrate: '64k',
+    compress_keep_original: false
+};
+
+async function loadSettings() {
+    try {
+        const response = await fetch('/api/settings');
+        if (response.ok) {
+            return await response.json();
+        }
+    } catch (e) {
+        console.error('Failed to load settings:', e);
+    }
+    return { ...DEFAULT_SETTINGS };
+}
+
+async function saveSettings(settings) {
+    try {
+        const response = await fetch('/api/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(settings)
+        });
+        return response.ok;
+    } catch (e) {
+        console.error('Failed to save settings:', e);
+        return false;
+    }
+}
+
+function populateForm(settings) {
+    document.getElementById('phone').value = settings.phone || '';
+    document.getElementById('password').value = settings.password || '';
+    document.getElementById('default_output_dir').value = settings.default_output_dir || './org_courses';
+    document.getElementById('delay_min').value = settings.delay_min || 1.0;
+    document.getElementById('delay_max').value = settings.delay_max || 3.0;
+    document.getElementById('download_images').checked = settings.download_images !== false;
+    document.getElementById('download_audio').checked = settings.download_audio !== false;
+    document.getElementById('download_video').checked = settings.download_video !== false;
+    document.getElementById('compress_media').checked = settings.compress_media !== false;
+    document.getElementById('compress_video_crf').value = settings.compress_video_crf || 28;
+    document.getElementById('compress_video_preset').value = settings.compress_video_preset || 'medium';
+    document.getElementById('compress_video_max_height').value = settings.compress_video_max_height || 720;
+    document.getElementById('compress_audio_bitrate').value = settings.compress_audio_bitrate || '64k';
+    document.getElementById('compress_keep_original').checked = settings.compress_keep_original === true;
+    
+    const warningEl = document.getElementById('warning-container');
+    if (!settings.phone || !settings.password) {
+        warningEl.style.display = 'block';
+    } else {
+        warningEl.style.display = 'none';
+    }
+}
+
+function getFormData() {
+    return {
+        phone: document.getElementById('phone').value,
+        password: document.getElementById('password').value,
+        default_output_dir: document.getElementById('default_output_dir').value,
+        delay_min: parseFloat(document.getElementById('delay_min').value) || 1.0,
+        delay_max: parseFloat(document.getElementById('delay_max').value) || 3.0,
+        headless: true,
+        download_images: document.getElementById('download_images').checked,
+        download_audio: document.getElementById('download_audio').checked,
+        download_video: document.getElementById('download_video').checked,
+        compress_media: document.getElementById('compress_media').checked,
+        compress_video_crf: parseInt(document.getElementById('compress_video_crf').value) || 28,
+        compress_video_preset: document.getElementById('compress_video_preset').value,
+        compress_video_max_height: parseInt(document.getElementById('compress_video_max_height').value) || 720,
+        compress_audio_bitrate: document.getElementById('compress_audio_bitrate').value || '64k',
+        compress_keep_original: document.getElementById('compress_keep_original').checked
+    };
+}
+
+function showMessage(text, isError = false) {
+    const container = document.getElementById('message-container');
+    container.innerHTML = `<div class="alert ${isError ? 'alert-warning' : 'alert-success'}">${text}</div>`;
+    setTimeout(() => { container.innerHTML = ''; }, 3000);
+}
+
+document.addEventListener('DOMContentLoaded', async function() {
+    document.querySelectorAll('.avatar-option').forEach(option => {
+        option.addEventListener('click', function() {
+            document.querySelectorAll('.avatar-option').forEach(o => o.classList.remove('selected'));
+            this.classList.add('selected');
+        });
+    });
+
+    document.getElementById('profile-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+
+        try {
+            const response = await fetch('/auth/me/profile', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                showMessage('个人信息已更新');
+            } else {
+                showMessage('保存失败', true);
+            }
+        } catch (e) {
+            showMessage('保存失败', true);
+        }
+    });
+
+    document.getElementById('password-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const oldPassword = document.getElementById('old-password').value;
+        const newPassword = document.getElementById('new-password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+
+        if (newPassword.length < 8) {
+            showMessage('密码长度必须大于等于8位', true);
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            showMessage('两次输入的密码不一致', true);
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('old_password', oldPassword);
+        formData.append('new_password', newPassword);
+
+        try {
+            const response = await fetch('/auth/me/password', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                showMessage('密码已修改，请重新登录');
+                setTimeout(() => {
+                    window.location.href = '/auth/login';
+                }, 1500);
+            } else {
+                showMessage('修改失败，请检查原密码是否正确', true);
+            }
+        } catch (e) {
+            showMessage('修改失败', true);
+        }
+    });
+
+    {% if is_admin %}
+    const settings = await loadSettings();
+    populateForm(settings);
+
+    document.getElementById('settings-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const settings = getFormData();
+
+        const saved = await saveSettings(settings);
+        if (saved) {
+            showMessage('设置已保存');
+        } else {
+            showMessage('保存设置失败', true);
+        }
+
+        populateForm(settings);
+    });
+    {% endif %}
+});
+
+async function resetSettings() {
+    if (!confirm('确定要恢复默认设置吗？账号信息也会被清空！')) return;
+    
+    const saved = await saveSettings(DEFAULT_SETTINGS);
+    if (saved) {
+        populateForm(DEFAULT_SETTINGS);
+        showMessage('已恢复默认设置');
+    } else {
+        showMessage('恢复默认设置失败', true);
+    }
+}
+</script>
+{% endblock %}

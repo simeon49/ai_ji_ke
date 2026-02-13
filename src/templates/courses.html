@@ -1,0 +1,495 @@
+{% extends "base.html" %}
+
+{% block title %}课程 - AI极客{% endblock %}
+
+{% block extra_head %}
+<style>
+    .search-bar {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+    }
+    .search-input {
+        flex: 1;
+        min-width: 200px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+        background: #f8fafc;
+    }
+    .search-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        background: white;
+    }
+    .filter-select {
+        padding: 0.75rem 1rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        background: white;
+        cursor: pointer;
+        min-width: 120px;
+    }
+    .filter-select:focus {
+        outline: none;
+        border-color: #3b82f6;
+    }
+    .keyword-filter {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .keyword-chip {
+        padding: 0.4rem 0.8rem;
+        background: #f1f5f9;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+        color: #64748b;
+    }
+    .keyword-chip:hover {
+        background: #e2e8f0;
+        color: #334155;
+    }
+    .keyword-chip.active {
+        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        color: white;
+        border-color: transparent;
+    }
+    .course-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.25rem;
+    }
+    .course-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1);
+        overflow: hidden;
+        transition: all 0.2s;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+    .course-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        border-color: #3b82f6;
+    }
+    .course-cover {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    }
+    .course-cover-placeholder {
+        width: 100%;
+        height: 160px;
+        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: rgba(255,255,255,0.5);
+    }
+    .course-content {
+        padding: 1.25rem;
+    }
+    .course-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.5rem;
+    }
+    .course-title {
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: #0f172a;
+        word-break: break-word;
+        flex: 1;
+        margin-right: 0.5rem;
+        line-height: 1.4;
+        max-height: 2.8em;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+    .course-status {
+        display: inline-block;
+        padding: 0.15rem 0.5rem;
+        border-radius: 10px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+    .status-completed { background: #d1fae5; color: #065f46; }
+    .status-in_progress { background: #dbeafe; color: #1e40af; }
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-unknown { background: #f1f5f9; color: #475569; }
+
+    .course-subtitle {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-bottom: 0.5rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .course-author {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        margin-bottom: 0.5rem;
+        font-size: 0.8rem;
+        color: #475569;
+    }
+    .course-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        font-size: 0.75rem;
+        color: #94a3b8;
+        margin-bottom: 0.5rem;
+    }
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.2rem;
+    }
+    .course-progress {
+        margin-top: 0.5rem;
+    }
+    .progress-text {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.7rem;
+        color: #64748b;
+        margin-bottom: 0.2rem;
+    }
+    .progress-bar {
+        width: 100%;
+        height: 6px;
+        background: #e2e8f0;
+        border-radius: 3px;
+        overflow: hidden;
+    }
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        transition: width 0.3s;
+    }
+    .course-keywords {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        margin-top: 0.4rem;
+    }
+    .keyword-tag {
+        font-size: 0.65rem;
+        padding: 0.1rem 0.35rem;
+        background: #f1f5f9;
+        border-radius: 3px;
+        color: #64748b;
+    }
+    .completed-time {
+        font-size: 0.7rem;
+        color: #059669;
+        margin-top: 0.4rem;
+    }
+    .results-count {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin-bottom: 1rem;
+    }
+    .loading {
+        text-align: center;
+        padding: 2rem;
+        color: #64748b;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 class="card-title">课程列表</h2>
+
+    <div class="search-bar">
+        <input type="text" class="search-input" id="searchInput" placeholder="搜索课程名称、作者或副标题...">
+        <select class="filter-select" id="directionFilter">
+            <option value="">全部方向</option>
+        </select>
+        <select class="filter-select" id="categoryFilter" disabled>
+            <option value="">全部分类</option>
+        </select>
+        <select class="filter-select" id="statusFilter">
+            <option value="">全部状态</option>
+            <option value="completed">已完成</option>
+            <option value="in_progress">爬取中</option>
+        </select>
+    </div>
+
+    <div class="keyword-filter" id="keywordFilter">
+        <span style="font-size: 0.8rem; color: #666; align-self: center;">关键词:</span>
+    </div>
+
+    <div class="results-count" id="resultsCount"></div>
+
+    <div class="course-grid" id="courseGrid">
+        <div class="loading">加载中...</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+let allCourses = [];
+let allKeywords = [];
+let allDirections = [];
+let currentFilter = {
+    search: '',
+    status: '',
+    keyword: '',
+    direction: '',
+    category: ''
+};
+
+// 加载课程数据
+async function loadCourses() {
+    try {
+        const response = await fetch('/api/courses');
+        const data = await response.json();
+        allCourses = data.courses;
+        allKeywords = data.keywords;
+        allDirections = data.directions || [];
+        renderDirections();
+        renderKeywords();
+        filterAndRender();
+    } catch (error) {
+        console.error('加载课程失败:', error);
+        document.getElementById('courseGrid').innerHTML = '<div class="empty-state"><p>加载失败，请刷新重试</p></div>';
+    }
+}
+
+// 渲染方向筛选器
+function renderDirections() {
+    const directionSelect = document.getElementById('directionFilter');
+    const options = allDirections.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+    directionSelect.innerHTML = '<option value="">全部方向</option>' + options;
+}
+
+// 更新分类筛选器选项
+function updateCategoryOptions(directionId) {
+    const categorySelect = document.getElementById('categoryFilter');
+    
+    if (!directionId) {
+        categorySelect.innerHTML = '<option value="">全部分类</option>';
+        categorySelect.disabled = true;
+        return;
+    }
+    
+    // 从全局标签配置获取分类（通过API或预加载）
+    fetch(`/api/labels/categories?direction=${directionId}`)
+        .then(res => res.json())
+        .then(data => {
+            const categories = data.categories || [];
+            const options = categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            categorySelect.innerHTML = '<option value="">全部分类</option>' + options;
+            categorySelect.disabled = false;
+        })
+        .catch(err => {
+            console.error('加载分类失败:', err);
+            categorySelect.innerHTML = '<option value="">全部分类</option>';
+            categorySelect.disabled = true;
+        });
+}
+
+// 渲染关键词过滤器
+function renderKeywords() {
+    const container = document.getElementById('keywordFilter');
+    const keywordsHtml = allKeywords.slice(0, 15).map(k => `
+        <span class="keyword-chip" data-keyword="${k}">${k}</span>
+    `).join('');
+    container.innerHTML = `<span style="font-size: 0.8rem; color: #666; align-self: center;">关键词:</span>${keywordsHtml}`;
+
+    // 绑定点击事件
+    container.querySelectorAll('.keyword-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            const keyword = chip.dataset.keyword;
+            if (currentFilter.keyword === keyword) {
+                currentFilter.keyword = '';
+                chip.classList.remove('active');
+            } else {
+                currentFilter.keyword = keyword;
+                container.querySelectorAll('.keyword-chip').forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+            }
+            filterAndRender();
+        });
+    });
+}
+
+// 过滤和渲染课程
+function filterAndRender() {
+    let filtered = allCourses;
+
+    // 搜索过滤
+    if (currentFilter.search) {
+        const search = currentFilter.search.toLowerCase();
+        filtered = filtered.filter(c =>
+            c.title.toLowerCase().includes(search) ||
+            c.author_name.toLowerCase().includes(search) ||
+            c.subtitle.toLowerCase().includes(search)
+        );
+    }
+
+    // 状态过滤
+    if (currentFilter.status) {
+        filtered = filtered.filter(c => c.status === currentFilter.status);
+    }
+
+    // 关键词过滤
+    if (currentFilter.keyword) {
+        filtered = filtered.filter(c => c.keywords.includes(currentFilter.keyword));
+    }
+
+    // 方向过滤
+    if (currentFilter.direction) {
+        filtered = filtered.filter(c => 
+            c.labels && c.labels.direction_id === currentFilter.direction
+        );
+    }
+
+    // 分类过滤
+    if (currentFilter.category) {
+        filtered = filtered.filter(c => 
+            c.labels && c.labels.category_ids && c.labels.category_ids.includes(currentFilter.category)
+        );
+    }
+
+    renderCourses(filtered);
+}
+
+// 渲染课程列表
+function renderCourses(courses) {
+    const grid = document.getElementById('courseGrid');
+    const countEl = document.getElementById('resultsCount');
+
+    countEl.textContent = `共 ${courses.length} 门课程`;
+
+    if (courses.length === 0) {
+        grid.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">📚</div>
+                <p>没有找到匹配的课程</p>
+            </div>
+        `;
+        return;
+    }
+
+    grid.innerHTML = courses.map(course => `
+        <a href="/courses/${course.path}" class="course-card">
+            ${course.cover_url
+                ? `<img src="${course.cover_url}" alt="${course.title}" class="course-cover">`
+                : `<div class="course-cover-placeholder">📚</div>`
+            }
+
+            <div class="course-content">
+                <div class="course-header">
+                    <div class="course-title" title="${course.title || course.name}">${course.title || course.name}</div>
+                    <span class="course-status status-${course.status}">
+                        ${course.status_label}
+                    </span>
+                </div>
+
+                ${course.subtitle ? `<div class="course-subtitle" title="${course.subtitle}">${course.subtitle}</div>` : ''}
+
+                ${course.author_name ? `
+                    <div class="course-author">
+                        <span>👤</span>
+                        <span>${course.author_name}</span>
+                        ${course.author_intro ? `<span style="color: #999;">· ${course.author_intro}</span>` : ''}
+                    </div>
+                ` : ''}
+
+                <div class="course-meta">
+                    ${course.unit ? `<span class="meta-item">📖 ${course.unit}</span>` : ''}
+                    ${course.learn_count ? `<span class="meta-item">👥 ${course.learn_count}人</span>` : ''}
+                    ${course.is_finished ? `` : '<span class="meta-item">🟢 课程未完结</span>'}
+                </div>
+
+                ${course.total_lessons > 0 && course.downloaded_lessons != course.total_lessons? `
+                    <div class="course-progress">
+                        <div class="progress-text">
+                            <span>爬取进度</span>
+                            <span>${course.downloaded_lessons}/${course.total_lessons}</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${Math.round(course.downloaded_lessons / course.total_lessons * 100)}%"></div>
+                        </div>
+                    </div>
+                ` : ''}
+
+                ${course.completed_at ? `
+                    <div class="completed-time">
+                        最后爬取日期 ${TimeUtils.toChinaTime(course.completed_at, 'date')}
+                    </div>
+                ` : ''}
+
+                ${course.keywords && course.keywords.length > 0 ? `
+                    <div class="course-keywords">
+                        ${course.keywords.slice(0, 4).map(k => `<span class="keyword-tag">${k}</span>`).join('')}
+                    </div>
+                ` : ''}
+            </div>
+        </a>
+    `).join('');
+}
+
+// 初始化
+document.addEventListener('DOMContentLoaded', () => {
+    loadCourses();
+
+    // 搜索输入
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', (e) => {
+        currentFilter.search = e.target.value;
+        filterAndRender();
+    });
+
+    // 方向过滤
+    const directionFilter = document.getElementById('directionFilter');
+    directionFilter.addEventListener('change', (e) => {
+        currentFilter.direction = e.target.value;
+        currentFilter.category = ''; // 重置分类
+        document.getElementById('categoryFilter').value = '';
+        updateCategoryOptions(e.target.value);
+        filterAndRender();
+    });
+
+    // 分类过滤
+    const categoryFilter = document.getElementById('categoryFilter');
+    categoryFilter.addEventListener('change', (e) => {
+        currentFilter.category = e.target.value;
+        filterAndRender();
+    });
+
+    // 状态过滤
+    const statusFilter = document.getElementById('statusFilter');
+    statusFilter.addEventListener('change', (e) => {
+        currentFilter.status = e.target.value;
+        filterAndRender();
+    });
+});
+</script>
+{% endblock %}

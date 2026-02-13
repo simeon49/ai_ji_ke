@@ -1,0 +1,46 @@
+# 爱极客 - Docker Compose 配置
+# 方便一键部署和分享给他人使用
+
+version: "3.8"
+
+services:
+  ai_ji_ke:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai_ji_ke
+    ports:
+      # 将容器的 8986 端口映射到主机的 8986 端口
+      # 你可以修改左边的端口号来使用其他端口，例如 "9000:8986"
+      - "8986:8986"
+    volumes:
+      # 课程下载目录持久化
+      # 课程文件将保存在主机的 ./org_courses 目录
+      - ./org_courses:/app/org_courses
+      
+      # 可选：持久化配置文件（用户数据、设置等）
+      # 数据将保存在 Docker Volume 中，重启后不会丢失
+      - ai_ji_ke_data:/root/.local/share/geekbang_crawler
+      
+      # 可选：如果你有本地配置文件想挂载进去
+      # - ./config:/app/config
+    environment:
+      # 设置时区
+      - TZ=Asia/Shanghai
+      # Python 输出不缓冲
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    # 资源限制（可选）
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '2.0'
+    #       memory: 2G
+    #     reservations:
+    #       cpus: '1.0'
+      #   memory: 512M
+
+# 定义持久化卷
+volumes:
+  ai_ji_ke_data:
+    driver: local

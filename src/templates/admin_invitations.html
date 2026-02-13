@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+
+{% block title %}邀请码管理 - AI极客{% endblock %}
+
+{% block extra_head %}
+<style>
+    .invitations-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
+    .invitations-table th,
+    .invitations-table td {
+        padding: 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+    }
+    .invitations-table th {
+        background: #f8f9fa;
+        font-weight: 600;
+    }
+    .invitations-table tr:hover {
+        background: #f8f9fa;
+    }
+    .code-display {
+        font-family: monospace;
+        font-size: 1.1rem;
+        font-weight: bold;
+        background: #e7f3ff;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        letter-spacing: 2px;
+    }
+    .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    .status-unused {
+        background: #d4edda;
+        color: #155724;
+    }
+    .status-used {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    .status-expired {
+        background: #ffeeba;
+        color: #856404;
+    }
+    .btn-create {
+        background: #28a745;
+        color: white;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.875rem;
+    }
+    .btn-create:hover {
+        background: #218838;
+    }
+    .btn-delete {
+        background: #dc3545;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.75rem;
+    }
+    .btn-delete:hover {
+        background: #c82333;
+    }
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+    .modal.active {
+        display: flex;
+    }
+    .modal-content {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        max-width: 400px;
+        width: 90%;
+    }
+    .modal-content h3 {
+        margin-top: 0;
+    }
+    .modal-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+    .form-group input {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+    }
+    /* 手机端表格横向滚动 */
+    @media (max-width: 768px) {
+        .invitations-table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .invitations-table {
+            min-width: 700px;
+        }
+        .card-header-mobile {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        .card-header-mobile .btn-create {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;" class="card-header-mobile">
+        <h2 class="card-title">邀请码管理</h2>
+        <button class="btn-create" onclick="openCreateModal()">+ 创建邀请码</button>
+    </div>
+
+    <div class="invitations-table-wrapper">
+        <table class="invitations-table">
+        <thead>
+            <tr>
+                <th>邀请码</th>
+                <th>创建者</th>
+                <th>创建时间</th>
+                <th>有效期</th>
+                <th>状态</th>
+                <th>使用信息</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for inv in invitations %}
+            <tr>
+                <td><span class="code-display">{{ inv.code }}</span></td>
+                <td>{{ inv.created_by }}</td>
+                <td data-time="{{ inv.created_at or '' }}">{{ inv.created_at[:19].replace('T', ' ') if inv.created_at else '-' }}</td>
+                <td data-time="{{ inv.expires_at or '' }}">{{ inv.expires_at[:19].replace('T', ' ') if inv.expires_at else '-' }}</td>
+                <td>
+                    {% if inv.used %}
+                        <span class="status-badge status-used">已使用</span>
+                    {% elif now > inv.expires_at %}
+                        <span class="status-badge status-expired">已过期</span>
+                    {% else %}
+                        <span class="status-badge status-unused">未使用</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if inv.used %}
+                        {{ inv.used_by }}<br>
+                        <small data-time="{{ inv.used_at or '' }}">{{ inv.used_at[:19].replace('T', ' ') if inv.used_at else '-' }}</small>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    <button class="btn-delete" onclick="deleteInvitation('{{ inv.code }}')">删除</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+
+    {% if not invitations %}
+    <p style="text-align: center; color: #666; padding: 2rem;">暂无邀请码</p>
+    {% endif %}
+</div>
+
+<div id="create-modal" class="modal">
+    <div class="modal-content">
+        <h3>创建邀请码</h3>
+        <div class="form-group">
+            <label for="days">有效期（天）</label>
+            <input type="number" id="days" name="days" value="3" min="1" max="30">
+        </div>
+        <div class="modal-actions">
+            <button class="btn" onclick="closeCreateModal()" style="background: #6c757d; color: white;">取消</button>
+            <button class="btn btn-primary" onclick="createInvitation()">创建</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function openCreateModal() {
+    document.getElementById('create-modal').classList.add('active');
+}
+
+function closeCreateModal() {
+    document.getElementById('create-modal').classList.remove('active');
+}
+
+async function createInvitation() {
+    const days = parseInt(document.getElementById('days').value);
+    if (days < 1 || days > 30) {
+        alert('有效期必须在1-30天之间');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('days', days);
+
+    try {
+        const response = await fetch('/admin/invitations/create', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            alert(`邀请码创建成功：${data.code}`);
+            location.reload();
+        } else {
+            alert('创建失败');
+        }
+    } catch (e) {
+        alert('创建失败');
+    }
+}
+
+async function deleteInvitation(code) {
+    if (!confirm(`确定要删除邀请码 ${code} 吗？`)) return;
+
+    try {
+        const response = await fetch(`/admin/invitations/${code}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            location.reload();
+        } else {
+            alert('删除失败');
+        }
+    } catch (e) {
+        alert('删除失败');
+    }
+}
+</script>
+{% endblock %}

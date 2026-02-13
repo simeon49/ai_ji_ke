@@ -1,0 +1,409 @@
+{% extends "base.html" %}
+
+{% block title %}任务 - AI极客{% endblock %}
+
+{% block extra_head %}
+<style>
+    .task-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        transition: background 0.2s;
+        text-decoration: none;
+        color: inherit;
+    }
+    .task-item:hover {
+        background: #f0f0f0;
+    }
+    .task-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-left: 1rem;
+    }
+    .task-actions .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    .btn-warning {
+        background: #ffc107;
+        color: #333;
+    }
+    .btn-warning:hover {
+        background: #e0a800;
+    }
+    .btn-success {
+        background: #28a745;
+        color: white;
+    }
+    .btn-success:hover {
+        background: #218838;
+    }
+    .status-paused { background: #fd7e14; color: white; }
+    .alert-warning {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        color: #856404;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 class="card-title">创建新任务</h2>
+    
+    <div id="settings-warning" class="alert-warning" style="display: none;">
+        请先在<a href="/settings">设置页面</a>配置账号信息
+    </div>
+    
+    <form id="create-task-form">
+        <div class="form-group">
+            <label for="url">课程链接</label>
+            <input type="url" id="url" name="url" placeholder="https://time.geekbang.org/column/intro/xxxxx" required>
+        </div>
+        <div class="form-group">
+            <label>选项</label>
+            <div class="checkbox-group">
+                <label class="checkbox-item">
+                    <input type="checkbox" id="headless" name="headless" checked>
+                    无头模式
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" id="download_images" name="download_images" checked>
+                    下载图片
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" id="download_audio" name="download_audio" checked>
+                    下载音频
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" id="download_video" name="download_video" checked>
+                    下载视频
+                </label>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">开始爬取</button>
+    </form>
+</div>
+
+<div class="card">
+    <h2 class="card-title">任务列表</h2>
+    <div class="task-list" id="task-list">
+        <div class="empty-state" id="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <p>暂无任务，请在上方创建新任务！</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const STATUS_MAP = {
+    'pending': '等待中',
+    'running': '运行中',
+    'paused': '已暂停',
+    'completed': '已完成',
+    'failed': '失败',
+    'cancelled': '已取消'
+};
+
+let tasksCache = [];
+
+async function loadSettings() {
+    try {
+        const response = await fetch('/api/settings');
+        if (response.ok) {
+            return await response.json();
+        }
+    } catch (e) {
+        console.error('Failed to load settings:', e);
+    }
+    return {};
+}
+
+function checkSettings(settings) {
+    const warning = document.getElementById('settings-warning');
+    const form = document.getElementById('create-task-form');
+    
+    if (!settings.phone || !settings.password) {
+        warning.style.display = 'block';
+        form.querySelector('button[type="submit"]').disabled = true;
+    } else {
+        warning.style.display = 'none';
+        form.querySelector('button[type="submit"]').disabled = false;
+    }
+}
+
+function renderTaskList() {
+    const taskList = document.getElementById('task-list');
+    const emptyState = document.getElementById('empty-state');
+    
+    const existingItems = taskList.querySelectorAll('.task-item');
+    existingItems.forEach(item => item.remove());
+    
+    if (tasksCache.length === 0) {
+        emptyState.style.display = 'block';
+        return;
+    }
+    
+    emptyState.style.display = 'none';
+    
+    tasksCache.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    
+    tasksCache.forEach(task => {
+        const item = createTaskItem(task);
+        taskList.appendChild(item);
+    });
+}
+
+function createTaskItem(task) {
+    const item = document.createElement('div');
+    item.className = 'task-item';
+    item.dataset.taskId = task.id;
+    
+    const title = task.course_title || `任务 #${task.id}`;
+    const statusText = STATUS_MAP[task.status] || task.status;
+    
+    let progressHtml = '';
+    if (task.status === 'running' && task.progress) {
+        progressHtml = `
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: ${task.progress.percentage || 0}%"></div>
+            </div>
+        `;
+    }
+    
+    item.innerHTML = `
+        <a href="/tasks/${task.id}" style="flex: 1; text-decoration: none; color: inherit;">
+            <div class="task-info">
+                <div class="task-title">${title}</div>
+                <div class="task-url">${task.url}</div>
+                ${progressHtml}
+            </div>
+        </a>
+        <span class="task-status status-${task.status}">${statusText}</span>
+        <div class="task-actions">${getTaskActions(task)}</div>
+    `;
+    
+    return item;
+}
+
+function getTaskActions(task) {
+    if (task.status === 'pending') {
+        return `
+            <button class="btn btn-warning btn-sm" onclick="pauseTask('${task.id}', event)">暂停</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteTask('${task.id}', event)">删除</button>
+        `;
+    } else if (task.status === 'running') {
+        return `
+            <button class="btn btn-warning btn-sm" onclick="pauseTask('${task.id}', event)">暂停</button>
+            <button class="btn btn-danger btn-sm" onclick="cancelTask('${task.id}', event)">取消</button>
+        `;
+    } else if (task.status === 'paused') {
+        return `
+            <button class="btn btn-success btn-sm" onclick="resumeTask('${task.id}', event)">恢复</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteTask('${task.id}', event)">删除</button>
+        `;
+    } else if (task.status === 'failed') {
+        return `
+            <button class="btn btn-success btn-sm" onclick="retryTask('${task.id}', event)">重试</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteTask('${task.id}', event)">删除</button>
+        `;
+    } else {
+        return `<button class="btn btn-danger btn-sm" onclick="deleteTask('${task.id}', event)">删除</button>`;
+    }
+}
+
+function updateTaskInCache(updatedTask) {
+    const index = tasksCache.findIndex(t => t.id === updatedTask.id);
+    if (index >= 0) {
+        tasksCache[index] = { ...tasksCache[index], ...updatedTask };
+    } else {
+        tasksCache.push(updatedTask);
+    }
+}
+
+function removeTaskFromCache(taskId) {
+    tasksCache = tasksCache.filter(t => t.id !== taskId);
+}
+
+document.addEventListener('DOMContentLoaded', async function() {
+    const settings = await loadSettings();
+    checkSettings(settings);
+    
+    const eventSource = new EventSource('/api/events');
+    
+    eventSource.addEventListener('init', function(e) {
+        const serverTasks = JSON.parse(e.data);
+        tasksCache = serverTasks;
+        renderTaskList();
+    });
+    
+    eventSource.addEventListener('task_started', function(e) {
+        const data = JSON.parse(e.data);
+        updateTaskInCache(data.task);
+        renderTaskList();
+    });
+    
+    eventSource.addEventListener('task_completed', function(e) {
+        const data = JSON.parse(e.data);
+        updateTaskInCache(data.task);
+        renderTaskList();
+    });
+    
+    eventSource.addEventListener('task_failed', function(e) {
+        const data = JSON.parse(e.data);
+        updateTaskInCache(data.task);
+        renderTaskList();
+    });
+    
+    eventSource.addEventListener('task_updated', function(e) {
+        const data = JSON.parse(e.data);
+        updateTaskInCache(data.task);
+        renderTaskList();
+    });
+    
+    eventSource.addEventListener('task_paused', function(e) {
+        const data = JSON.parse(e.data);
+        updateTaskInCache(data.task);
+        renderTaskList();
+    });
+    
+    eventSource.addEventListener('task_resumed', function(e) {
+        const data = JSON.parse(e.data);
+        updateTaskInCache(data.task);
+        renderTaskList();
+    });
+    
+    eventSource.addEventListener('task_retrying', function(e) {
+        const data = JSON.parse(e.data);
+        updateTaskInCache(data.task);
+        renderTaskList();
+    });
+    
+    eventSource.addEventListener('task_queued', function(e) {
+        const data = JSON.parse(e.data);
+        updateTaskInCache(data.task);
+        renderTaskList();
+    });
+    
+    eventSource.addEventListener('task_deleted', function(e) {
+        const data = JSON.parse(e.data);
+        removeTaskFromCache(data.task_id);
+        renderTaskList();
+    });
+    
+    eventSource.addEventListener('task_cancelled', function(e) {
+        const data = JSON.parse(e.data);
+        updateTaskInCache(data.task);
+        renderTaskList();
+    });
+    
+    document.getElementById('create-task-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData();
+        formData.append('url', document.getElementById('url').value);
+        formData.append('headless', document.getElementById('headless').checked ? 'true' : 'false');
+        formData.append('download_images', document.getElementById('download_images').checked ? 'true' : 'false');
+        formData.append('download_audio', document.getElementById('download_audio').checked ? 'true' : 'false');
+        formData.append('download_video', document.getElementById('download_video').checked ? 'true' : 'false');
+        
+        try {
+            const response = await fetch('/tasks/create', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (response.redirected) {
+                window.location.href = response.url;
+            } else if (!response.ok) {
+                alert('创建任务失败');
+            }
+        } catch (err) {
+            alert('错误: ' + err.message);
+        }
+    });
+});
+
+async function pauseTask(taskId, event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    try {
+        const response = await fetch(`/tasks/${taskId}/pause`, { method: 'POST' });
+        if (!response.ok) {
+            alert('暂停任务失败');
+        }
+    } catch (e) {
+        alert('错误: ' + e.message);
+    }
+}
+
+async function resumeTask(taskId, event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    try {
+        const response = await fetch(`/tasks/${taskId}/resume`, { method: 'POST' });
+        if (!response.ok) {
+            alert('恢复任务失败');
+        }
+    } catch (e) {
+        alert('错误: ' + e.message);
+    }
+}
+
+async function retryTask(taskId, event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    try {
+        const response = await fetch(`/tasks/${taskId}/retry`, { method: 'POST' });
+        if (!response.ok) {
+            alert('重试任务失败');
+        }
+    } catch (e) {
+        alert('错误: ' + e.message);
+    }
+}
+
+async function cancelTask(taskId, event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    if (!confirm('确定要取消这个任务吗？')) return;
+    
+    try {
+        const response = await fetch(`/tasks/${taskId}/cancel`, { method: 'POST' });
+        if (!response.ok) {
+            alert('取消任务失败');
+        }
+    } catch (e) {
+        alert('错误: ' + e.message);
+    }
+}
+
+async function deleteTask(taskId, event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    if (!confirm('确定要删除这个任务吗？')) return;
+    
+    try {
+        const response = await fetch(`/tasks/${taskId}`, { method: 'DELETE' });
+        if (!response.ok) {
+            alert('删除任务失败');
+        }
+    } catch (e) {
+        alert('错误: ' + e.message);
+    }
+}
+</script>
+{% endblock %}

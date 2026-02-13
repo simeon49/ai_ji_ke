@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AI极客{% endblock %}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans SC', sans-serif;
+            background: #f7f4ed;
+            min-height: 100vh;
+            color: #2c3e50;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            line-height: 1.7;
+        }
+        .navbar {
+            background: #8b7355;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 12px rgba(139, 115, 85, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        .navbar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar h1 {
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        .navbar nav {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .navbar a {
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+        .navbar a:hover {
+            color: white;
+            background: rgba(255,255,255,0.15);
+        }
+        .dropdown {
+            display: flex;
+            align-items: center;
+        }
+        .avatar-nav {
+            padding: 0.3rem 0.5rem !important;
+        }
+        .avatar-nav img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.3);
+            transition: all 0.2s;
+        }
+        @media (max-width: 768px) {
+            .avatar-nav img {
+                width: 48px;
+                height: 48px;
+            }
+        }
+        .avatar-nav:hover img {
+            border-color: white;
+        }
+        .dropdown {
+            position: relative;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            min-width: 180px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            padding: 0.5rem 0;
+            z-index: 1000;
+        }
+        .dropdown:hover .dropdown-menu {
+            display: block;
+        }
+        .dropdown-menu a {
+            display: block;
+            color: #2c3e50;
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            margin: 0.25rem 0.5rem;
+        }
+        .dropdown-menu a:hover {
+            background: #f5f0e8;
+            color: #8b7355;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .card {
+            background: #fffbf5;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e8e0d5;
+        }
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #d4c5b0;
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="password"],
+        .form-group input[type="number"],
+        .form-group input[type="email"],
+        .form-group input[type="url"] {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d4c5b0;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: #f5f0e8;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #8b7355;
+            box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
+            background: #fffbf5;
+        }
+        .checkbox-group {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #3b82f6;
+        }
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .btn-primary {
+            background: #8b7355;
+            color: white;
+            box-shadow: 0 2px 8px rgba(139, 115, 85, 0.25);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            background: #7a6448;
+            box-shadow: 0 4px 12px rgba(139, 115, 85, 0.35);
+        }
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .task-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem;
+            background: #f5f0e8;
+            border-radius: 12px;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        .task-item:hover {
+            background: #e8e0d5;
+            border-color: #d4c5b0;
+        }
+        .task-info {
+            flex: 1;
+        }
+        .task-title {
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 0.25rem;
+        }
+        .task-url {
+            font-size: 0.875rem;
+            color: #5d4e37;
+            word-break: break-all;
+        }
+        .task-status {
+            display: inline-block;
+            padding: 0.3rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .status-pending { background: #f5e6d3; color: #8b5a2b; }
+        .status-running { background: #d4c5b0; color: #3d2e17; }
+        .status-completed { background: #c8e6c9; color: #2d5a2d; }
+        .status-failed { background: #ffcdd2; color: #b71c1c; }
+        .status-cancelled { background: #e8e0d5; color: #5d4e37; }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #d4c5b0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #8b7355;
+            transition: width 0.3s;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #5d4e37;
+        }
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        .breadcrumb {
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: #5d4e37;
+        }
+        .breadcrumb a {
+            color: #8b7355;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .breadcrumb a:hover {
+            color: #5d4e37;
+        }
+        /* 汉堡菜单按钮 */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 28px;
+            height: 24px;
+            cursor: pointer;
+            z-index: 101;
+        }
+        .hamburger span {
+            width: 100%;
+            height: 2px;
+            background: white;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0.75rem 1rem;
+            }
+            .navbar-content {
+                position: relative;
+            }
+            .hamburger {
+                display: flex;
+            }
+            .navbar nav {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                flex-direction: column;
+                background: #8b7355;
+                padding: 0.5rem 0;
+                margin-top: 0.5rem;
+                border-radius: 12px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+                display: none;
+                gap: 0;
+            }
+            .navbar nav.active {
+                display: flex;
+            }
+            .navbar a {
+                width: 100%;
+                text-align: center;
+                padding: 0.75rem 1rem;
+                justify-content: center;
+            }
+            .dropdown {
+                display: block;
+                width: 100%;
+                text-align: center;
+            }
+            .dropdown > a {
+                justify-content: center;
+            }
+            .dropdown-menu {
+                position: static;
+                background: rgba(255,255,255,0.1);
+                box-shadow: none;
+                min-width: 100%;
+                display: block;
+                padding: 0.25rem 0;
+            }
+            .dropdown-menu a {
+                color: rgba(255,255,255,0.9);
+                padding: 0.5rem 1rem;
+            }
+            .dropdown-menu a:hover {
+                background: rgba(255,255,255,0.15);
+                color: white;
+            }
+            .checkbox-group {
+                flex-direction: column;
+            }
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <h1>AI极客</h1>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <nav id="nav-menu">
+                {% if current_user %}
+                <a href="/courses">课程列表</a>
+                {% if current_user and current_user.role.value == 'admin' %}
+                <div class="dropdown">
+                    <a href="javascript:void(0)">平台管理 ▾</a>
+                    <div class="dropdown-menu">
+                        <a href="/tasks">爬虫任务</a>
+                        <a href="/admin/users">平台用户管理</a>
+                        <a href="/admin/invitations">邀请码管理</a>
+                        <a href="/admin/settings">系统设置</a>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="dropdown">
+                    <a href="javascript:void(0)" class="avatar-nav">
+                        <img src="/static/avatars/{{ current_user.avatar }}" alt="用户头像">
+                    </a>
+                    <div class="dropdown-menu">
+                        <a href="/settings">个人信息设置</a>
+                        <a href="javascript:void(0)" onclick="confirmLogout()">退出登录</a>
+                    </div>
+                </div>
+                {% else %}
+                <a href="/auth/login">登录</a>
+                <a href="/auth/register">注册</a>
+                {% endif %}
+            </nav>
+        </div>
+    </nav>
+    
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+    
+    {% block extra_scripts %}{% endblock %}
+    <script>
+        // 确认退出登录
+        function confirmLogout() {
+            if (confirm('确定要退出登录吗？')) {
+                window.location.href = '/auth/logout';
+            }
+        }
+
+        // 移动端导航菜单控制
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburger = document.getElementById('hamburger');
+            const navMenu = document.getElementById('nav-menu');
+            
+            if (hamburger && navMenu) {
+                hamburger.addEventListener('click', function() {
+                    hamburger.classList.toggle('active');
+                    navMenu.classList.toggle('active');
+                });
+                
+                // 点击导航链接后关闭菜单
+                const navLinks = navMenu.querySelectorAll('a');
+                navLinks.forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        hamburger.classList.remove('active');
+                        navMenu.classList.remove('active');
+                    });
+                });
+                
+                // 点击页面其他位置关闭菜单
+                document.addEventListener('click', function(e) {
+                    if (!hamburger.contains(e.target) && !navMenu.contains(e.target)) {
+                        hamburger.classList.remove('active');
+                        navMenu.classList.remove('active');
+                    }
+                });
+            }
+        });
+        
+        // 全局时间格式化工具 - 统一转换为北京时间（中国时区）
+        window.TimeUtils = {
+            // 将任意时间字符串转换为北京时间
+            toChinaTime: function(timeString, format = 'full') {
+                if (!timeString || timeString === '-' || timeString === '') return '-';
+                try {
+                    // 如果已经是本地时间格式（不含Z或时区信息），先当作UTC处理
+                    let date;
+                    if (typeof timeString === 'number') {
+                        date = new Date(timeString);
+                    } else if (timeString.includes('Z') || timeString.match(/[+-]\d{2}:\d{2}$/)) {
+                        // 已经有明确的时区信息
+                        date = new Date(timeString);
+                    } else {
+                        // 没有时区信息，假设是UTC时间（因为后端存储的是utcnow()）
+                        date = new Date(timeString + 'Z');
+                    }
+                    
+                    if (isNaN(date.getTime())) return '-';
+                    
+                    // 转换为中国时区时间
+                    const chinaTime = new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Shanghai' }));
+                    const utcTime = new Date(date.toLocaleString('en-US', { timeZone: 'UTC' }));
+                    const offset = chinaTime.getTime() - utcTime.getTime();
+                    const beijingDate = new Date(date.getTime() + offset);
+                    
+                    if (format === 'date') {
+                        // 仅日期格式: YYYY-MM-DD
+                        return beijingDate.toLocaleDateString('zh-CN', { 
+                            timeZone: 'Asia/Shanghai',
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit'
+                        }).replace(/\//g, '-');
+                    } else if (format === 'time') {
+                        // 仅时间格式: HH:mm:ss
+                        return beijingDate.toLocaleTimeString('zh-CN', { 
+                            timeZone: 'Asia/Shanghai',
+                            hour12: false,
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                        });
+                    } else {
+                        // 完整格式: YYYY-MM-DD HH:mm:ss
+                        const dateStr = beijingDate.toLocaleDateString('zh-CN', { 
+                            timeZone: 'Asia/Shanghai',
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit'
+                        }).replace(/\//g, '-');
+                        const timeStr = beijingDate.toLocaleTimeString('zh-CN', { 
+                            timeZone: 'Asia/Shanghai',
+                            hour12: false,
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                        });
+                        return dateStr + ' ' + timeStr;
+                    }
+                } catch (e) {
+                    console.error('时间格式化错误:', e, timeString);
+                    return timeString || '-';
+                }
+            },
+            
+            // 自动转换页面中所有带有 data-time 属性的元素
+            autoConvert: function() {
+                // 转换完整的日期时间
+                document.querySelectorAll('[data-time]').forEach(function(el) {
+                    const time = el.getAttribute('data-time');
+                    const format = el.getAttribute('data-time-format') || 'full';
+                    if (time && time !== '-') {
+                        el.textContent = TimeUtils.toChinaTime(time, format);
+                    }
+                });
+                
+                // 转换仅日期
+                document.querySelectorAll('[data-date]').forEach(function(el) {
+                    const time = el.getAttribute('data-date');
+                    if (time && time !== '-') {
+                        el.textContent = TimeUtils.toChinaTime(time, 'date');
+                    }
+                });
+            }
+        };
+        
+        // 页面加载完成后自动转换所有时间
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', TimeUtils.autoConvert);
+        } else {
+            TimeUtils.autoConvert();
+        }
+    </script>
+</body>
+</html>

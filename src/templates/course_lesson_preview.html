@@ -1,0 +1,420 @@
+{% extends "base.html" %}
+{% from "_course_base.html" import shared_styles, sidebar, shared_scripts %}
+
+{% block title %}{{ file_name }} - AI极客{% endblock %}
+
+{% block extra_head %}
+{{ shared_styles() }}
+<script src="/static/marked.min.js"></script>
+{% endblock %}
+
+{% block content %}
+{{ sidebar(chapters, None, course_name, course_path) }}
+
+<div class="page-layout" id="mainLayout">
+    <main class="main-content">
+        <div class="breadcrumb-bar">
+            <a href="/courses">课程列表</a> / <a href="/courses/org_courses/{{ course_path }}" class="course-name">{{ course_name }}</a> / {{ file_name }}
+        </div>
+        <div class="rich-content" id="rendered-content"></div>
+        <pre id="raw-content" style="display:none;">{{ content }}</pre>
+    </main>
+    
+    <!-- 浮动音频按钮 -->
+    <button class="audio-fab" id="audioFab" title="音频播放">🎵</button>
+    
+    <!-- 遮罩层 -->
+    <div class="audio-player-overlay" id="audioOverlay"></div>
+    
+    <!-- 音频播放弹窗 -->
+    <aside class="audio-player-bar" id="audioPlayerBar">
+        <div class="audio-player-header">
+            <div class="audio-player-title">音频播放</div>
+            <button class="audio-player-close" id="audioCloseBtn" title="关闭">✕</button>
+        </div>
+        <div class="audio-player-controls">
+            <div class="audio-player-main-controls">
+                <button class="audio-player-btn" id="rewindBtn" title="后退10秒">⏪</button>
+                <button class="audio-player-btn play-pause" id="playPauseBtn" title="播放/暂停">▶</button>
+                <button class="audio-player-btn" id="forwardBtn" title="快进10秒">⏩</button>
+            </div>
+            <div class="audio-player-progress">
+                <input type="range" class="audio-player-progress-bar" id="progressBar" min="0" max="100" value="0">
+                <div class="audio-player-time">
+                    <span id="currentTime">00:00</span>
+                    <span id="duration">00:00</span>
+                </div>
+            </div>
+            <div class="audio-player-speed">
+                <span class="audio-player-speed-label">倍速:</span>
+                <select class="audio-player-speed-select" id="speedSelect">
+                    <option value="0.5">0.5x</option>
+                    <option value="0.75">0.75x</option>
+                    <option value="1" selected>1x</option>
+                    <option value="1.25">1.25x</option>
+                    <option value="1.5">1.5x</option>
+                    <option value="2">2x</option>
+                </select>
+            </div>
+        </div>
+    </aside>
+    
+    <audio id="audioElement" style="display:none;"></audio>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+{{ shared_scripts() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 自动展开包含当前课程的章节
+    const activeLesson = document.querySelector('.lesson-item.active');
+    if (activeLesson) {
+        const lessonList = activeLesson.closest('.lesson-list');
+        if (lessonList) {
+            lessonList.classList.remove('collapsed');
+            const chapterHeader = lessonList.previousElementSibling;
+            if (chapterHeader) {
+                const toggle = chapterHeader.querySelector('.chapter-toggle');
+                if (toggle) {
+                    toggle.classList.remove('collapsed');
+                }
+            }
+        }
+    }
+
+    // 渲染 Markdown
+    const rawContent = document.getElementById('raw-content').textContent;
+    const renderedContent = document.getElementById('rendered-content');
+
+    marked.setOptions({
+        breaks: true,
+        gfm: true,
+        highlight: function(code, lang) {
+            return code;
+        }
+    });
+
+    renderedContent.innerHTML = marked.parse(rawContent);
+
+    // 处理图片和媒体
+    const coursePath = '{{ course_path }}';
+    processImages(renderedContent, coursePath);
+    processMediaLinks(renderedContent, coursePath);
+
+    // 初始化音频播放栏
+    initAudioPlayer();
+
+    // 初始化学习进度追踪
+    initLearningProgress();
+});
+
+// 音频播放栏初始化
+function initAudioPlayer() {
+    const audioPlayerBar = document.getElementById('audioPlayerBar');
+    const audioElement = document.getElementById('audioElement');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const progressBar = document.getElementById('progressBar');
+    const currentTimeEl = document.getElementById('currentTime');
+    const durationEl = document.getElementById('duration');
+    const speedSelect = document.getElementById('speedSelect');
+    const rewindBtn = document.getElementById('rewindBtn');
+    const forwardBtn = document.getElementById('forwardBtn');
+    const audioFab = document.getElementById('audioFab');
+    const audioOverlay = document.getElementById('audioOverlay');
+    const audioCloseBtn = document.getElementById('audioCloseBtn');
+    
+    const renderedContent = document.getElementById('rendered-content');
+    const audioInContent = renderedContent.querySelector('audio');
+    
+    if (!audioInContent) {
+        return;
+    }
+    
+    audioElement.src = audioInContent.src;
+    
+    const audioParent = audioInContent.parentElement;
+    if (audioParent && audioParent.textContent.includes('音频')) {
+        audioParent.style.display = 'none';
+    } else {
+        audioInContent.style.display = 'none';
+    }
+    
+    const isWideScreen = window.innerWidth > 1024;
+    
+    if (isWideScreen) {
+        audioPlayerBar.classList.add('visible');
+    } else {
+        audioFab.classList.add('has-audio');
+    }
+    
+    function openPlayer() {
+        audioPlayerBar.classList.add('visible');
+        audioOverlay.classList.add('visible');
+    }
+    
+    function closePlayer() {
+        if (!isWideScreen) {
+            audioPlayerBar.classList.remove('visible');
+            audioOverlay.classList.remove('visible');
+        }
+    }
+    
+    audioFab.addEventListener('click', openPlayer);
+    audioCloseBtn.addEventListener('click', closePlayer);
+    audioOverlay.addEventListener('click', closePlayer);
+    
+    playPauseBtn.addEventListener('click', function() {
+        if (audioElement.paused) {
+            audioElement.play();
+            playPauseBtn.textContent = '⏸';
+            audioFab.classList.add('playing');
+        } else {
+            audioElement.pause();
+            playPauseBtn.textContent = '▶';
+            audioFab.classList.remove('playing');
+        }
+    });
+    
+    forwardBtn.addEventListener('click', function() {
+        audioElement.currentTime = Math.min(audioElement.currentTime + 10, audioElement.duration);
+    });
+    
+    rewindBtn.addEventListener('click', function() {
+        audioElement.currentTime = Math.max(audioElement.currentTime - 10, 0);
+    });
+    
+    audioElement.addEventListener('timeupdate', function() {
+        const progress = (audioElement.currentTime / audioElement.duration) * 100;
+        progressBar.value = progress;
+        currentTimeEl.textContent = formatTime(audioElement.currentTime);
+    });
+    
+    progressBar.addEventListener('input', function() {
+        const time = (progressBar.value / 100) * audioElement.duration;
+        audioElement.currentTime = time;
+    });
+    
+    audioElement.addEventListener('loadedmetadata', function() {
+        durationEl.textContent = formatTime(audioElement.duration);
+    });
+    
+    speedSelect.addEventListener('change', function() {
+        audioElement.playbackRate = parseFloat(this.value);
+    });
+    
+    audioElement.addEventListener('ended', function() {
+        playPauseBtn.textContent = '▶';
+        audioFab.classList.remove('playing');
+    });
+    
+    audioElement.addEventListener('error', function() {
+        console.error('音频加载失败:', audioElement.src);
+        audioPlayerBar.style.display = 'none';
+        audioFab.style.display = 'none';
+    });
+    
+    window.addEventListener('resize', function() {
+        const nowWide = window.innerWidth > 1024;
+        if (nowWide && !audioPlayerBar.classList.contains('visible')) {
+            audioPlayerBar.classList.add('visible');
+            audioOverlay.classList.remove('visible');
+            audioFab.classList.remove('has-audio');
+        } else if (!nowWide && !audioOverlay.classList.contains('visible')) {
+            audioPlayerBar.classList.remove('visible');
+            audioFab.classList.add('has-audio');
+        }
+    });
+}
+
+// 格式化时间 (秒 -> MM:SS)
+function formatTime(seconds) {
+    if (isNaN(seconds)) {
+        return '00:00';
+    }
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+}
+
+// 学习进度追踪
+function initLearningProgress() {
+    const renderedContent = document.getElementById('rendered-content');
+    const currentLessonPath = window.location.pathname.replace('/course_lesson_preview/', '');
+    const coursePath = '{{ course_path }}';
+
+    // 检查是否已完成
+    checkLessonCompletion();
+
+    // 1. 滚动检测 - 检测是否滚动到 "## 精选留言" 或页面底部
+    let scrollMarked = false;
+    const scrollThreshold = 0.95; // 95% 滚动
+
+    function checkScrollProgress() {
+        if (scrollMarked) return;
+
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const scrollPercent = scrollTop / docHeight;
+
+        // 检查 "## 精选留言" 标题是否出现在视口内（可见区域）
+        const commentSection = Array.from(renderedContent.querySelectorAll('h1, h2, h3')).find(el => {
+            return el.textContent.includes('精选留言');
+        });
+
+        if (commentSection) {
+            const rect = commentSection.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+
+            // 如果"精选留言"出现在页面底部区域（视口底部 20% 范围内）
+            if (rect.top > 0 && rect.top < windowHeight * 0.8) {
+                markLessonCompleted('scroll');
+                scrollMarked = true;
+                return;
+            }
+        }
+
+        // 检查是否滚动到页面底部 95%
+        if (scrollPercent >= scrollThreshold) {
+            markLessonCompleted('bottom');
+            scrollMarked = true;
+        }
+    }
+
+    window.addEventListener('scroll', checkScrollProgress);
+
+    // 2. 音频/视频播放进度检测
+    const audioElement = document.getElementById('audioElement');
+    const videoElement = renderedContent.querySelector('video');
+    let mediaMarked = false;
+    const mediaThreshold = 0.95; // 95% 播放
+
+    function checkMediaProgress() {
+        if (mediaMarked) return;
+
+        if (audioElement && !audioElement.paused && audioElement.duration > 0) {
+            const progress = audioElement.currentTime / audioElement.duration;
+            if (progress >= mediaThreshold) {
+                markLessonCompleted('media');
+                mediaMarked = true;
+            }
+        }
+
+        if (videoElement && !videoElement.paused && videoElement.duration > 0) {
+            const progress = videoElement.currentTime / videoElement.duration;
+            if (progress >= mediaThreshold) {
+                markLessonCompleted('media');
+                mediaMarked = true;
+            }
+        }
+    }
+
+    if (audioElement) {
+        audioElement.addEventListener('timeupdate', checkMediaProgress);
+    }
+    if (videoElement) {
+        videoElement.addEventListener('timeupdate', checkMediaProgress);
+    }
+}
+
+// 检查小节是否已完成
+async function checkLessonCompletion() {
+    const currentLessonPath = window.location.pathname.replace('/course_lesson_preview/', '');
+    const coursePath = '{{ course_path }}';
+    const apiCoursePath = coursePath.startsWith('org_courses/') ? coursePath : 'org_courses/' + coursePath;
+
+    try {
+        const response = await fetch('/api/courses/' + apiCoursePath + '/learning-progress');
+        if (response.ok) {
+            const data = await response.json();
+            if (data.completed_lessons && data.completed_lessons.includes(currentLessonPath)) {
+                markLessonAsCompletedInUI();
+            }
+        }
+    } catch (error) {
+        console.error('Failed to check lesson completion:', error);
+    }
+}
+
+// 标记小节为已完成（调用 API）
+async function markLessonCompleted(completionType) {
+    const currentLessonPath = window.location.pathname.replace('/course_lesson_preview/', '');
+    const coursePath = '{{ course_path }}';
+    const apiCoursePath = coursePath.startsWith('org_courses/') ? coursePath : 'org_courses/' + coursePath;
+
+    // 标准化 lesson_path：移除 org_courses/ 前缀
+    const normalizedLessonPath = currentLessonPath.startsWith('org_courses/') ? currentLessonPath.replace('org_courses/', '') : currentLessonPath;
+
+    try {
+        const response = await fetch('/api/courses/' + apiCoursePath + '/learning-progress', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                lesson_path: normalizedLessonPath,
+                completion_type: completionType
+            })
+        });
+
+        if (response.ok) {
+            markLessonAsCompletedInUI();
+            // 刷新侧边栏中所有小节的学习进度
+            refreshSidebarProgress();
+        }
+    } catch (error) {
+        console.error('Failed to mark lesson as completed:', error);
+    }
+}
+
+// 在 UI 中标记小节为已完成
+function markLessonAsCompletedInUI() {
+    // 标记侧边栏中的当前小节
+    const activeLesson = document.querySelector('.lesson-item.active');
+    if (activeLesson) {
+        activeLesson.classList.add('completed');
+    }
+}
+
+// 重新加载侧边栏的学习进度
+async function refreshSidebarProgress() {
+    const coursePath = '{{ course_path }}';
+    const apiCoursePath = coursePath.startsWith('org_courses/') ? coursePath : 'org_courses/' + coursePath;
+
+    try {
+        const response = await fetch('/api/courses/' + apiCoursePath + '/learning-progress');
+        if (response.ok) {
+            const data = await response.json();
+            if (data.completed_lessons) {
+                updateAllSidebarLessons(data.completed_lessons);
+            }
+        }
+    } catch (error) {
+        console.error('Failed to refresh sidebar progress:', error);
+    }
+}
+
+// 更新侧边栏中所有小节的完成状态
+function updateAllSidebarLessons(completedLessons) {
+    console.log('updateAllSidebarLessons called with:', completedLessons);
+    const lessonItems = document.querySelectorAll('.lesson-item');
+    console.log('Found lesson items:', lessonItems.length);
+
+    lessonItems.forEach(item => {
+        const href = item.getAttribute('href');
+        if (href) {
+            let lessonPath = href.replace('/course_lesson_preview/', '');
+            // 标准化：移除 org_courses/ 前缀
+            lessonPath = lessonPath.startsWith('org_courses/') ? lessonPath.replace('org_courses/', '') : lessonPath;
+
+            const isCompleted = completedLessons.includes(lessonPath);
+            console.log(`Lesson: ${lessonPath}, Completed: ${isCompleted}`);
+
+            if (isCompleted) {
+                item.classList.add('completed');
+            }
+        }
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,398 @@
+{% extends "base.html" %}
+
+{% block title %}任务 #{{ task.id }} - AI极客{% endblock %}
+
+{% block extra_head %}
+<style>
+    .task-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+    }
+    .task-meta {
+        color: #666;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+    }
+    .progress-section {
+        margin: 1.5rem 0;
+    }
+    .progress-text {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+        color: #666;
+    }
+    .progress-bar-large {
+        width: 100%;
+        height: 12px;
+        background: #e9ecef;
+        border-radius: 6px;
+        overflow: hidden;
+    }
+    .progress-fill-large {
+        height: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        transition: width 0.3s;
+    }
+    .current-item {
+        margin-top: 0.5rem;
+        font-size: 0.875rem;
+        color: #666;
+    }
+    .log-container {
+        max-height: 400px;
+        overflow-y: auto;
+        background: #1a1a2e;
+        border-radius: 8px;
+        padding: 1rem;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        font-size: 0.8rem;
+        line-height: 1.6;
+    }
+    .log-entry {
+        color: #a0a0a0;
+        white-space: pre-wrap;
+        word-break: break-all;
+    }
+    .log-entry.error {
+        color: #ff6b6b;
+    }
+    .log-entry.success {
+        color: #51cf66;
+    }
+    .actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    .error-message {
+        background: #fff5f5;
+        border: 1px solid #feb2b2;
+        color: #c53030;
+        padding: 1rem;
+        border-radius: 8px;
+        margin: 1rem 0;
+    }
+    .status-paused { background: #fd7e14; color: white; }
+    .btn-warning {
+        background: #ffc107;
+        color: #333;
+    }
+    .btn-warning:hover {
+        background: #e0a800;
+    }
+    .btn-success {
+        background: #28a745;
+        color: white;
+    }
+    .btn-success:hover {
+        background: #218838;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="task-header">
+        <div>
+            <h2 class="card-title" style="border: none; padding: 0; margin: 0;">
+                <span id="course-title">
+                    {% if task.course_title %}{{ task.course_title }}{% else %}任务 #{{ task.id }}{% endif %}
+                </span>
+            </h2>
+            <div class="task-meta">
+                <div>链接: {{ task.url }}</div>
+                <div>创建时间: <span data-time="{{ task.created_at.isoformat() if task.created_at else '' }}">{{ task.created_at.strftime('%Y-%m-%d %H:%M:%S') if task.created_at else '-' }}</span></div>
+                {% if task.output_dir %}
+                <div>输出目录: {{ task.output_dir }}</div>
+                {% endif %}
+            </div>
+        </div>
+        <span class="task-status status-{{ task.status.value }}" id="task-status">
+            {% if task.status == TaskStatus.PENDING %}等待中
+            {% elif task.status == TaskStatus.RUNNING %}运行中
+            {% elif task.status == TaskStatus.PAUSED %}已暂停
+            {% elif task.status == TaskStatus.COMPLETED %}已完成
+            {% elif task.status == TaskStatus.FAILED %}失败
+            {% elif task.status == TaskStatus.CANCELLED %}已取消
+            {% else %}{{ task.status.value }}{% endif %}
+        </span>
+    </div>
+    
+    {% if task.error_message %}
+    <div class="error-message" id="error-message">
+        {{ task.error_message }}
+    </div>
+    {% endif %}
+    
+    <div class="progress-section" id="progress-section" {% if task.status != TaskStatus.RUNNING %}style="display:none"{% endif %}>
+        <div class="progress-text">
+            <span id="progress-current">{{ task.progress.current }}</span> / <span id="progress-total">{{ task.progress.total }}</span>
+            <span id="progress-percentage">{{ task.progress.percentage }}%</span>
+        </div>
+        <div class="progress-bar-large">
+            <div class="progress-fill-large" id="progress-fill" style="width: {{ task.progress.percentage }}%"></div>
+        </div>
+        <div class="current-item" id="current-item">
+            {% if task.progress.current_item %}正在处理: {{ task.progress.current_item }}{% endif %}
+        </div>
+    </div>
+    
+    <div class="actions" id="task-actions">
+        <a href="/tasks" class="btn btn-primary btn-sm">返回任务列表</a>
+        {% if task.status == TaskStatus.PENDING %}
+        <button class="btn btn-warning btn-sm" onclick="pauseTask()">暂停</button>
+        <button class="btn btn-danger btn-sm" onclick="cancelTask()">取消</button>
+        {% elif task.status == TaskStatus.RUNNING %}
+        <button class="btn btn-warning btn-sm" onclick="pauseTask()">暂停</button>
+        <button class="btn btn-danger btn-sm" onclick="cancelTask()">取消</button>
+        {% elif task.status == TaskStatus.PAUSED %}
+        <button class="btn btn-success btn-sm" onclick="resumeTask()">恢复</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteTask()">删除</button>
+        {% elif task.status == TaskStatus.FAILED %}
+        <button class="btn btn-success btn-sm" onclick="retryTask()">重试</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteTask()">删除</button>
+        {% elif task.status in [TaskStatus.COMPLETED, TaskStatus.CANCELLED] %}
+        <button class="btn btn-danger btn-sm" onclick="deleteTask()">删除</button>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <h3 class="card-title">运行日志</h3>
+    <div class="log-container" id="log-container">
+        {% for log in task.logs %}
+        <div class="log-entry {% if 'Error' in log or '错误' in log %}error{% elif 'Done' in log or 'completed' in log or '完成' in log %}success{% endif %}">{{ log }}</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const taskId = '{{ task.id }}';
+let eventSource = null;
+
+const STATUS_MAP = {
+    'pending': '等待中',
+    'running': '运行中',
+    'paused': '已暂停',
+    'completed': '已完成',
+    'failed': '失败',
+    'cancelled': '已取消'
+};
+
+function connectSSE() {
+    eventSource = new EventSource(`/api/tasks/${taskId}/events`);
+    
+    eventSource.addEventListener('progress', function(e) {
+        const data = JSON.parse(e.data);
+        updateProgress(data.progress);
+        document.getElementById('progress-section').style.display = 'block';
+    });
+    
+    eventSource.addEventListener('log', function(e) {
+        const data = JSON.parse(e.data);
+        addLog(data.message);
+    });
+    
+    eventSource.addEventListener('course_info', function(e) {
+        const data = JSON.parse(e.data);
+        document.getElementById('course-title').textContent = data.course_title;
+    });
+    
+    eventSource.addEventListener('started', function(e) {
+        updateStatus('running');
+        document.getElementById('progress-section').style.display = 'block';
+    });
+    
+    eventSource.addEventListener('completed', function(e) {
+        updateStatus('completed');
+        document.getElementById('progress-section').style.display = 'none';
+        eventSource.close();
+    });
+    
+    eventSource.addEventListener('failed', function(e) {
+        const data = JSON.parse(e.data);
+        updateStatus('failed');
+        if (data.error) {
+            let errorEl = document.getElementById('error-message');
+            if (!errorEl) {
+                errorEl = document.createElement('div');
+                errorEl.id = 'error-message';
+                errorEl.className = 'error-message';
+                document.querySelector('.task-header').after(errorEl);
+            }
+            errorEl.textContent = data.error;
+        }
+        eventSource.close();
+    });
+    
+    eventSource.addEventListener('cancelled', function(e) {
+        updateStatus('cancelled');
+        document.getElementById('progress-section').style.display = 'none';
+        eventSource.close();
+    });
+    
+    eventSource.addEventListener('paused', function(e) {
+        updateStatus('paused');
+    });
+    
+    eventSource.addEventListener('resumed', function(e) {
+        updateStatus('pending');
+    });
+    
+    eventSource.addEventListener('retrying', function(e) {
+        updateStatus('pending');
+        const errorEl = document.getElementById('error-message');
+        if (errorEl) {
+            errorEl.remove();
+        }
+    });
+    
+    eventSource.onerror = function(e) {
+        console.error('SSE error:', e);
+    };
+}
+
+function updateStatus(status) {
+    const statusEl = document.getElementById('task-status');
+    statusEl.className = `task-status status-${status}`;
+    statusEl.textContent = STATUS_MAP[status] || status;
+    updateActions(status);
+}
+
+function updateActions(status) {
+    const actionsEl = document.getElementById('task-actions');
+    let html = '<a href="/tasks" class="btn btn-primary btn-sm">返回任务列表</a>';
+    
+    if (status === 'pending') {
+        html += `
+            <button class="btn btn-warning btn-sm" onclick="pauseTask()">暂停</button>
+            <button class="btn btn-danger btn-sm" onclick="cancelTask()">取消</button>
+        `;
+    } else if (status === 'running') {
+        html += `
+            <button class="btn btn-warning btn-sm" onclick="pauseTask()">暂停</button>
+            <button class="btn btn-danger btn-sm" onclick="cancelTask()">取消</button>
+        `;
+    } else if (status === 'paused') {
+        html += `
+            <button class="btn btn-success btn-sm" onclick="resumeTask()">恢复</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteTask()">删除</button>
+        `;
+    } else if (status === 'failed') {
+        html += `
+            <button class="btn btn-success btn-sm" onclick="retryTask()">重试</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteTask()">删除</button>
+        `;
+    } else if (['completed', 'cancelled'].includes(status)) {
+        html += `<button class="btn btn-danger btn-sm" onclick="deleteTask()">删除</button>`;
+    }
+    
+    actionsEl.innerHTML = html;
+}
+
+function updateProgress(progress) {
+    document.getElementById('progress-current').textContent = progress.current;
+    document.getElementById('progress-total').textContent = progress.total;
+    document.getElementById('progress-percentage').textContent = progress.percentage + '%';
+    document.getElementById('progress-fill').style.width = progress.percentage + '%';
+    if (progress.current_item) {
+        document.getElementById('current-item').textContent = '正在处理: ' + progress.current_item;
+    }
+}
+
+function addLog(message) {
+    const container = document.getElementById('log-container');
+    const entry = document.createElement('div');
+    entry.className = 'log-entry';
+    if (message.includes('Error') || message.includes('错误')) {
+        entry.classList.add('error');
+    } else if (message.includes('Done') || message.includes('completed') || message.includes('完成')) {
+        entry.classList.add('success');
+    }
+    entry.textContent = message;
+    container.appendChild(entry);
+    container.scrollTop = container.scrollHeight;
+}
+
+async function cancelTask() {
+    if (!confirm('确定要取消这个任务吗？')) return;
+    
+    try {
+        const response = await fetch(`/tasks/${taskId}/cancel`, { method: 'POST' });
+        if (response.ok) {
+            location.reload();
+        } else {
+            alert('取消任务失败');
+        }
+    } catch (e) {
+        alert('错误: ' + e.message);
+    }
+}
+
+async function pauseTask() {
+    try {
+        const response = await fetch(`/tasks/${taskId}/pause`, { method: 'POST' });
+        if (!response.ok) {
+            alert('暂停任务失败');
+        }
+    } catch (e) {
+        alert('错误: ' + e.message);
+    }
+}
+
+async function resumeTask() {
+    try {
+        const response = await fetch(`/tasks/${taskId}/resume`, { method: 'POST' });
+        if (!response.ok) {
+            alert('恢复任务失败');
+        }
+    } catch (e) {
+        alert('错误: ' + e.message);
+    }
+}
+
+async function retryTask() {
+    try {
+        const response = await fetch(`/tasks/${taskId}/retry`, { method: 'POST' });
+        if (response.ok) {
+            location.reload();
+        } else {
+            alert('重试任务失败');
+        }
+    } catch (e) {
+        alert('错误: ' + e.message);
+    }
+}
+
+async function deleteTask() {
+    if (!confirm('确定要删除这个任务吗？')) return;
+    
+    try {
+        const response = await fetch(`/tasks/${taskId}`, { method: 'DELETE' });
+        if (response.ok) {
+            window.location.href = '/';
+        } else {
+            alert('删除任务失败');
+        }
+    } catch (e) {
+        alert('错误: ' + e.message);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const status = '{{ task.status.value }}';
+    if (status === 'pending' || status === 'running') {
+        connectSSE();
+    }
+    
+    const logContainer = document.getElementById('log-container');
+    logContainer.scrollTop = logContainer.scrollHeight;
+});
+</script>
+{% endblock %}

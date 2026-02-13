@@ -1,0 +1,140 @@
+{
+  "version": "1.0",
+  "directions": [
+    {
+      "id": "ai",
+      "name": "人工智能",
+      "sort": 100,
+      "keywords": ["AI", "人工智能", "机器学习", "深度学习", "神经网络"],
+      "categories": [
+        {"id": "llm", "name": "大模型", "sort": 100, "keywords": ["大模型", "LLM", "大语言模型", "GPT", "ChatGPT"]},
+        {"id": "multimodal", "name": "多模态", "sort": 95, "keywords": ["多模态", "multimodal", "视觉", "语音"]},
+        {"id": "agent", "name": "Agent", "sort": 90, "keywords": ["Agent", "智能体", "Autonomous", "自主智能"]},
+        {"id": "rag", "name": "RAG", "sort": 85, "keywords": ["RAG", "检索增强", "向量数据库", "知识库"]},
+        {"id": "nlp", "name": "NLP", "sort": 80, "keywords": ["NLP", "自然语言处理", "文本分析", "语义理解"]},
+        {"id": "ml", "name": "机器学习", "sort": 75, "keywords": ["机器学习", "Machine Learning", "ML", "算法"]},
+        {"id": "dl", "name": "深度学习", "sort": 70, "keywords": ["深度学习", "Deep Learning", "神经网络", "CNN", "RNN"]},
+        {"id": "ai_algo", "name": "AI 算法", "sort": 65, "keywords": ["AI 算法", "算法", "推荐算法", "搜索算法"]},
+        {"id": "aigc", "name": "AIGC 应用", "sort": 60, "keywords": ["AIGC", "生成式AI", "内容生成", "AI绘画"]},
+        {"id": "prompt", "name": "提示词工程", "sort": 55, "keywords": ["提示词", "Prompt", "Prompt Engineering"]},
+        {"id": "cv", "name": "计算机视觉", "sort": 50, "keywords": ["计算机视觉", "CV", "图像识别", "目标检测"]},
+        {"id": "ai_coding", "name": "智能编码", "sort": 45, "keywords": ["智能编码", "AI编程", "代码生成", "Copilot"]},
+        {"id": "pytorch", "name": "PyTorch", "sort": 40, "keywords": ["PyTorch", "PyTorch实战"]},
+        {"id": "langchain", "name": "LangChain", "sort": 35, "keywords": ["LangChain", "LangChain实战"]}
+      ]
+    },
+    {
+      "id": "backend",
+      "name": "后端/架构",
+      "sort": 90,
+      "keywords": ["后端", "架构", "服务", "Server"],
+      "categories": [
+        {"id": "microservice", "name": "微服务", "sort": 100, "keywords": ["微服务", "Microservice", "分布式"]},
+        {"id": "cloud_native", "name": "云原生", "sort": 95, "keywords": ["云原生", "Cloud Native", "K8s", "Kubernetes", "Docker"]},
+        {"id": "middleware", "name": "中间件", "sort": 90, "keywords": ["中间件", "消息队列", "MQ", "Kafka", "Redis"]},
+        {"id": "high_concurrency", "name": "高并发", "sort": 85, "keywords": ["高并发", "并发", "性能优化"]},
+        {"id": "architecture", "name": "架构设计", "sort": 80, "keywords": ["架构", "架构设计", "系统架构"]},
+        {"id": "storage", "name": "存储", "sort": 75, "keywords": ["存储", "数据库", "MySQL", "PostgreSQL", "MongoDB"]},
+        {"id": "api", "name": "API 设计", "sort": 70, "keywords": ["API", "接口", "REST", "GraphQL"]},
+        {"id": "ddd", "name": "领域驱动", "sort": 65, "keywords": ["DDD", "领域驱动", "领域建模"]}
+      ]
+    },
+    {
+      "id": "bigdata",
+      "name": "大数据",
+      "sort": 80,
+      "keywords": ["大数据", "数据", "Big Data", "数据处理"],
+      "categories": [
+        {"id": "spark", "name": "Spark", "sort": 100, "keywords": ["Spark", "Spark SQL", "Spark Streaming"]},
+        {"id": "flink", "name": "Flink", "sort": 95, "keywords": ["Flink", "流计算", "实时计算"]},
+        {"id": "data_warehouse", "name": "数据仓库", "sort": 90, "keywords": ["数据仓库", "Data Warehouse", "数仓"]},
+        {"id": "data_analysis", "name": "数据分析", "sort": 85, "keywords": ["数据分析", "Data Analysis", "BI"]},
+        {"id": "etl", "name": "ETL", "sort": 80, "keywords": ["ETL", "数据集成", "数据同步"]},
+        {"id": "data_mining", "name": "数据挖掘", "sort": 75, "keywords": ["数据挖掘", "Data Mining"]}
+      ]
+    },
+    {
+      "id": "security",
+      "name": "安全",
+      "sort": 70,
+      "keywords": ["安全", "Security", "网络安全", "信息安全"],
+      "categories": [
+        {"id": "app_security", "name": "应用安全", "sort": 100, "keywords": ["应用安全", "Web安全", "渗透测试"]},
+        {"id": "crypto", "name": "密码学", "sort": 95, "keywords": ["密码学", "加密", "Crypto", "区块链"]},
+        {"id": "devsecops", "name": "DevSecOps", "sort": 90, "keywords": ["DevSecOps", "安全开发", "SDL"]}
+      ]
+    },
+    {
+      "id": "cs_basic",
+      "name": "计算机基础",
+      "sort": 60,
+      "keywords": ["计算机基础", "基础", "原理", "底层"],
+      "categories": [
+        {"id": "algo", "name": "算法", "sort": 100, "keywords": ["算法", "数据结构", "Algorithm", "LeetCode"]},
+        {"id": "os", "name": "操作系统", "sort": 95, "keywords": ["操作系统", "OS", "Linux", "Unix"]},
+        {"id": "network", "name": "网络协议", "sort": 90, "keywords": ["网络", "协议", "TCP/IP", "HTTP"]},
+        {"id": "compiler", "name": "编译原理", "sort": 85, "keywords": ["编译", "Compiler", "编译原理"]},
+        {"id": "math", "name": "数学", "sort": 80, "keywords": ["数学", "线性代数", "概率论", "微积分"]}
+      ]
+    },
+    {
+      "id": "frontend",
+      "name": "前端/移动",
+      "sort": 50,
+      "keywords": ["前端", "移动", "Frontend", "Mobile", "Web"],
+      "categories": [
+        {"id": "react", "name": "React", "sort": 100, "keywords": ["React", "React Native"]},
+        {"id": "vue", "name": "Vue", "sort": 95, "keywords": ["Vue", "Vue.js", "Vue3"]},
+        {"id": "javascript", "name": "JavaScript", "sort": 90, "keywords": ["JavaScript", "JS", "ES6", "TypeScript"]},
+        {"id": "css", "name": "CSS", "sort": 85, "keywords": ["CSS", "样式", "响应式"]},
+        {"id": "mobile", "name": "移动端", "sort": 80, "keywords": ["移动端", "Android", "iOS", "Flutter", "小程序"]},
+        {"id": "performance", "name": "性能优化", "sort": 75, "keywords": ["性能", "优化", "加载优化"]}
+      ]
+    },
+    {
+      "id": "ops",
+      "name": "运维/测试",
+      "sort": 40,
+      "keywords": ["运维", "测试", "DevOps", "SRE"],
+      "categories": [
+        {"id": "devops", "name": "DevOps", "sort": 100, "keywords": ["DevOps", "CI/CD", "自动化部署"]},
+        {"id": "testing", "name": "测试", "sort": 95, "keywords": ["测试", "自动化测试", "单元测试", "TDD"]},
+        {"id": "monitoring", "name": "监控", "sort": 90, "keywords": ["监控", "Prometheus", "Grafana", "日志"]},
+        {"id": "sre", "name": "SRE", "sort": 85, "keywords": ["SRE", "可靠性", "稳定性"]}
+      ]
+    },
+    {
+      "id": "leadership",
+      "name": "技术领导力",
+      "sort": 30,
+      "keywords": ["管理", "领导力", "团队", "管理"],
+      "categories": [
+        {"id": "team_mgmt", "name": "团队管理", "sort": 100, "keywords": ["团队管理", "团队建设", "人员管理"]},
+        {"id": "tech_lead", "name": "技术管理", "sort": 95, "keywords": ["技术管理", "CTO", "技术总监"]},
+        {"id": "soft_skills", "name": "软技能", "sort": 90, "keywords": ["沟通", "演讲", "写作", "软技能"]}
+      ]
+    },
+    {
+      "id": "product",
+      "name": "产品/增长",
+      "sort": 20,
+      "keywords": ["产品", "产品经理", "PM", "增长"],
+      "categories": [
+        {"id": "product_mgmt", "name": "产品管理", "sort": 100, "keywords": ["产品", "产品经理", "产品设计", "需求分析"]},
+        {"id": "growth", "name": "增长", "sort": 95, "keywords": ["增长", "Growth", "用户增长", "运营"]},
+        {"id": "data_product", "name": "数据产品", "sort": 90, "keywords": ["数据产品", "数据分析产品"]}
+      ]
+    },
+    {
+      "id": "career",
+      "name": "多元成长",
+      "sort": 10,
+      "keywords": ["职场", "成长", "职业发展", "效率"],
+      "categories": [
+        {"id": "career_dev", "name": "职业发展", "sort": 100, "keywords": ["职场", "职业", "晋升", "跳槽"]},
+        {"id": "efficiency", "name": "效率提升", "sort": 95, "keywords": ["效率", "时间管理", "生产力", "工具"]},
+        {"id": "interview", "name": "面试求职", "sort": 90, "keywords": ["面试", "求职", "简历", "招聘"]}
+      ]
+    }
+  ]
+}

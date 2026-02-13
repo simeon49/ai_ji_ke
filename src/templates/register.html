@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}注册 - AI极客{% endblock %}
+
+{% block extra_head %}
+<style>
+    .auth-container {
+        max-width: 500px;
+        margin: 3rem auto;
+    }
+    .auth-card {
+        background: #fffbf5;
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        border: 1px solid #e8e0d5;
+    }
+    .auth-title {
+        text-align: center;
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 0.5rem;
+    }
+    .auth-subtitle {
+        text-align: center;
+        color: #5d4e37;
+        margin-bottom: 2rem;
+        font-size: 0.95rem;
+    }
+    .btn-block {
+        width: 100%;
+        margin-top: 1rem;
+    }
+    .auth-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #d4c5b0;
+        color: #5d4e37;
+    }
+    .auth-footer a {
+        color: #8b7355;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .auth-footer a:hover {
+        text-decoration: underline;
+    }
+    .error-message {
+        background: #fee2e2;
+        color: #b91c1c;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+        border: 1px solid #fecaca;
+    }
+    .avatar-selection {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.75rem;
+        margin-top: 0.5rem;
+    }
+    .avatar-option {
+        cursor: pointer;
+        border-radius: 12px;
+        padding: 0.5rem;
+        border: 2px solid #d4c5b0;
+        transition: all 0.2s;
+        text-align: center;
+    }
+    .avatar-option:hover {
+        border-color: #8b7355;
+        background: #e8e0d5;
+    }
+    .avatar-option.selected {
+        border-color: #8b7355;
+        background: #e8e0d5;
+        box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.2);
+    }
+    .avatar-option img {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+    }
+    .avatar-option input {
+        display: none;
+    }
+    .password-hint {
+        font-size: 0.8rem;
+        color: #7a6448;
+        margin-top: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h1 class="auth-title">创建账号</h1>
+        <p class="auth-subtitle">注册AI极客，开始学习之旅</p>
+
+        {% if error %}
+        <div class="error-message">{{ error }}</div>
+        {% endif %}
+
+        <form method="post" action="/auth/register">
+            <div class="form-group">
+                <label for="username">邮箱（用于登录和找回密码）</label>
+                <input type="email" id="username" name="username" required placeholder="请输入邮箱" autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" name="password" required placeholder="请输入密码（至少8位）" minlength="8">
+                <p class="password-hint">密码长度至少8位</p>
+            </div>
+
+            <div class="form-group">
+                <label for="nickname">昵称</label>
+                <input type="text" id="nickname" name="nickname" required placeholder="请输入昵称">
+            </div>
+
+            <div class="form-group">
+                <label>选择头像</label>
+                <div class="avatar-selection">
+                    {% for avatar in avatars %}
+                    <label class="avatar-option" id="avatar-{{ loop.index }}">
+                        <input type="radio" name="avatar" value="{{ avatar }}" {% if loop.first %}checked{% endif %}>
+                        <img src="/static/avatars/{{ avatar }}" alt="Avatar {{ loop.index }}">
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {% if not is_first_setup %}
+            <div class="form-group">
+                <label for="invitation_code">邀请码</label>
+                <input type="text" id="invitation_code" name="invitation_code" required placeholder="请输入邀请码" style="font-family: monospace; letter-spacing: 2px; text-transform: uppercase;">
+                <p class="password-hint">注册需要有效的邀请码</p>
+            </div>
+            {% endif %}
+
+            <button type="submit" class="btn btn-primary btn-block">注册</button>
+        </form>
+
+        <div class="auth-footer">
+            已有账号？<a href="/auth/login">立即登录</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.avatar-option').forEach(option => {
+        option.addEventListener('click', function() {
+            document.querySelectorAll('.avatar-option').forEach(o => o.classList.remove('selected'));
+            this.classList.add('selected');
+        });
+    });
+    document.querySelector('.avatar-option.selected')?.classList.add('selected');
+</script>
+{% endblock %}

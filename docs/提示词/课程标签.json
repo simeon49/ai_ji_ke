@@ -1,0 +1,1292 @@
+
+
+优化课程列表页面分类功能:
+{
+    "error": [],
+    "extra": [],
+    "data": {
+        "nav": [
+            {
+                "id": 1,
+                "name": "专栏",
+                "color": "#5ba6ff",
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/dd\/9e\/dd8cbc79f017d1b01f643c7ea929d79e.png"
+            },
+            {
+                "id": 3,
+                "name": "视频课程",
+                "color": "#79c109",
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/4a\/c3\/4aebe8fb752fa21a0fd989a45d9847c3.png"
+            }
+        ],
+        "labels": [
+            {
+                "display_type": 3,
+                "lid": 3,
+                "count": 914,
+                "sort": 96,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/8b\/2a\/8bac8aaebda64638a859d29866641e2a.png",
+                "name": "后端\/架构",
+                "es_icon": "https:\/\/static001.geekbang.org\/resource\/image\/e3\/bd\/e3d2d27febc892b124e5387d30e86abd.png",
+                "pid": 0
+            },
+            {
+                "display_type": 3,
+                "lid": 5,
+                "count": 362,
+                "sort": 88,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/40\/f1\/4019851e2472c46fyy5c8414f7d0e4f1.png",
+                "name": "前端\/移动",
+                "es_icon": "https:\/\/static001.geekbang.org\/resource\/image\/a0\/aa\/a0fe1de257a6f3ed08d2248b5dd2f6aa.png",
+                "pid": 0
+            },
+            {
+                "display_type": 3,
+                "lid": 6,
+                "count": 224,
+                "sort": 86,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/74\/da\/7463f34778d8bb92c06bd362a7800cda.png",
+                "name": "运维\/测试",
+                "es_icon": "https:\/\/static001.geekbang.org\/resource\/image\/23\/fa\/23e45a346190c42fe0a1da381fa9aafa.png",
+                "pid": 0
+            },
+            {
+                "display_type": 3,
+                "lid": 9,
+                "count": 90,
+                "sort": 90,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/d1\/47\/d1441dc51557f91be02305efc94c1947.png",
+                "name": "计算机基础",
+                "es_icon": "https:\/\/static001.geekbang.org\/resource\/image\/89\/34\/890c04a9c3a09d3c3a5ef43a25ffac34.png",
+                "pid": 0
+            },
+            {
+                "display_type": 3,
+                "lid": 10,
+                "count": 79,
+                "sort": 78,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/36\/0c\/3693bd7769db46ed406fb67cdf12370c.png",
+                "name": "Java",
+                "es_icon": "",
+                "pid": 3
+            },
+            {
+                "display_type": 3,
+                "lid": 11,
+                "count": 28,
+                "sort": 76,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/c5\/8b\/c5a81f99294bc6c85a13bf913403388b.png",
+                "name": "Go",
+                "es_icon": "",
+                "pid": 3
+            },
+            {
+                "display_type": 3,
+                "lid": 12,
+                "count": 12,
+                "sort": 74,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/02\/6f\/02f2f3b53dbd9dc71a827c5daee02a6f.png",
+                "name": "Python",
+                "es_icon": "",
+                "pid": 3
+            },
+            {
+                "display_type": 3,
+                "lid": 13,
+                "count": 129,
+                "sort": 54,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/27\/ca\/27d6dcb073a89878fdabeee97e03d8ca.png",
+                "name": "数据库",
+                "es_icon": "",
+                "pid": 3
+            },
+            {
+                "display_type": 3,
+                "lid": 14,
+                "count": 110,
+                "sort": 56,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/87\/6f\/87cd4a4400d2418ab6ee31f54b748f6f.png",
+                "name": "微服务",
+                "es_icon": "",
+                "pid": 3
+            },
+            {
+                "display_type": 3,
+                "lid": 17,
+                "count": 46,
+                "sort": 64,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/85\/f2\/850ddd018aefe4c22e00afb9eb37dcf2.png",
+                "name": "中间件",
+                "es_icon": "",
+                "pid": 3
+            },
+            {
+                "display_type": 3,
+                "lid": 18,
+                "count": 26,
+                "sort": 58,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/17\/e2\/17d7708a9a17304e7c6e423e367074e2.png",
+                "name": "DDD",
+                "es_icon": "",
+                "pid": 3
+            },
+            {
+                "display_type": 3,
+                "lid": 19,
+                "count": 25,
+                "sort": 60,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/d0\/e2\/d0cac9392f038335509d9a20fd6752e2.png",
+                "name": "中台",
+                "es_icon": "",
+                "pid": 3
+            },
+            {
+                "display_type": 3,
+                "lid": 20,
+                "count": 73,
+                "sort": 66,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/fc\/59\/fca9051a168ca00dd8577562c5d4e459.png",
+                "name": "分布式",
+                "es_icon": "",
+                "pid": 3
+            },
+            {
+                "display_type": 3,
+                "lid": 21,
+                "count": 1,
+                "sort": 62,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/57\/66\/57c4eeded7yy6104279e3bec3b264b66.png",
+                "name": "全栈",
+                "es_icon": "",
+                "pid": 3
+            },
+            {
+                "display_type": 3,
+                "lid": 23,
+                "count": 41,
+                "sort": 48,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/aa\/88\/aac4edfd4d64a1837b61ba4889879188.png",
+                "name": "区块链",
+                "es_icon": "",
+                "pid": 3
+            },
+            {
+                "display_type": 3,
+                "lid": 30,
+                "count": 24,
+                "sort": 78,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/36\/44\/36f97f1710da189d90c98a3e84cbb544.png",
+                "name": "JavaScript",
+                "es_icon": "",
+                "pid": 5
+            },
+            {
+                "display_type": 3,
+                "lid": 31,
+                "count": 14,
+                "sort": 76,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/99\/26\/990f55e4eyya18f195813512ff93dd26.png",
+                "name": "TypeScript",
+                "es_icon": "",
+                "pid": 5
+            },
+            {
+                "display_type": 3,
+                "lid": 32,
+                "count": 85,
+                "sort": 40,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/15\/2f\/150e0b764a74206f320d1yybed06482f.png",
+                "name": "框架",
+                "es_icon": "",
+                "pid": 5
+            },
+            {
+                "display_type": 3,
+                "lid": 33,
+                "count": 35,
+                "sort": 72,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/24\/21\/244d0140abb341917bcf32f2476ef721.png",
+                "name": "Android",
+                "es_icon": "",
+                "pid": 5
+            },
+            {
+                "display_type": 3,
+                "lid": 34,
+                "count": 26,
+                "sort": 74,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/e4\/de\/e4936065d74fd471f41ec7c43991b6de.png",
+                "name": "iOS",
+                "es_icon": "",
+                "pid": 5
+            },
+            {
+                "display_type": 3,
+                "lid": 35,
+                "count": 1,
+                "sort": 58,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/bc\/d0\/bc60a12fdcc5c887a6c384297fc121d0.png",
+                "name": "Kotlin",
+                "es_icon": "",
+                "pid": 5
+            },
+            {
+                "display_type": 3,
+                "lid": 36,
+                "count": 1,
+                "sort": 60,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/da\/0a\/da1ceee6d3bfd5991c32357e0805bb0a.png",
+                "name": "Swift",
+                "es_icon": "",
+                "pid": 5
+            },
+            {
+                "display_type": 3,
+                "lid": 37,
+                "count": 31,
+                "sort": 62,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/a4\/24\/a4d22546b31ffc6cc309ba398840ec24.png",
+                "name": "浏览器",
+                "es_icon": "",
+                "pid": 5
+            },
+            {
+                "display_type": 3,
+                "lid": 38,
+                "count": 21,
+                "sort": 64,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/23\/63\/23d3a18340acf116a8eec8dfa6869b63.png",
+                "name": "音视频",
+                "es_icon": "",
+                "pid": 5
+            },
+            {
+                "display_type": 3,
+                "lid": 39,
+                "count": 7,
+                "sort": 66,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/90\/76\/90bc61ee82fc0143d7f5f6d8ebf01576.png",
+                "name": "webpack",
+                "es_icon": "",
+                "pid": 5
+            },
+            {
+                "display_type": 3,
+                "lid": 40,
+                "count": 15,
+                "sort": 68,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/3y\/66\/3yyf2a07a78ef15b0edf948e34ed8f66.png",
+                "name": "网络",
+                "es_icon": "",
+                "pid": 5
+            },
+            {
+                "display_type": 3,
+                "lid": 41,
+                "count": 14,
+                "sort": 70,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/25\/ff\/25c55982dafcbefcd3471e95851fbcff.png",
+                "name": "Node.js",
+                "es_icon": "",
+                "pid": 5
+            },
+            {
+                "display_type": 3,
+                "lid": 42,
+                "count": 35,
+                "sort": 20,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/95\/50\/9566c5edf9be8f1b17yyf962688ba950.png",
+                "name": "Kubernetes",
+                "es_icon": "",
+                "pid": 6
+            },
+            {
+                "display_type": 3,
+                "lid": 43,
+                "count": 26,
+                "sort": 24,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/53\/4f\/5395f6688c5ed8678ab156105782a84f.png",
+                "name": "DevOps",
+                "es_icon": "",
+                "pid": 6
+            },
+            {
+                "display_type": 3,
+                "lid": 44,
+                "count": 38,
+                "sort": 26,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/c7\/93\/c7aee2e365076c4b34b70c722e576493.png",
+                "name": "运维管理",
+                "es_icon": "",
+                "pid": 6
+            },
+            {
+                "display_type": 3,
+                "lid": 45,
+                "count": 11,
+                "sort": 38,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/26\/19\/26d10fc4b65987ea5286309bed883719.png",
+                "name": "CI\/CD",
+                "es_icon": "",
+                "pid": 6
+            },
+            {
+                "display_type": 3,
+                "lid": 47,
+                "count": 18,
+                "sort": 34,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/9b\/6d\/9b0559e6856565d98b20181aab9c5d6d.png",
+                "name": "测试",
+                "es_icon": "",
+                "pid": 6
+            },
+            {
+                "display_type": 3,
+                "lid": 48,
+                "count": 7,
+                "sort": 28,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/5c\/f4\/5cfa0def9872cd1c2f22e1bc9e7b5af4.png",
+                "name": "Linux",
+                "es_icon": "",
+                "pid": 6
+            },
+            {
+                "display_type": 3,
+                "lid": 49,
+                "count": 31,
+                "sort": 30,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/90\/74\/9026892055b36a116b3c702ab43f0974.png",
+                "name": "性能",
+                "es_icon": "",
+                "pid": 6
+            },
+            {
+                "display_type": 3,
+                "lid": 50,
+                "count": 10,
+                "sort": 32,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/b2\/07\/b284299f17f51b2f6fd75b111c913207.png",
+                "name": "敏捷开发",
+                "es_icon": "",
+                "pid": 6
+            },
+            {
+                "display_type": 3,
+                "lid": 51,
+                "count": 0,
+                "sort": 1,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/3c\/28\/3caf91e570e23bdca410773e19d75128.png",
+                "name": "案例分析",
+                "es_icon": "",
+                "pid": 7
+            },
+            {
+                "display_type": 3,
+                "lid": 52,
+                "count": 5,
+                "sort": 2,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/c5\/c2\/c5f8e52953f17ef264e30dc8e36798c2.png",
+                "name": "基本功",
+                "es_icon": "",
+                "pid": 7
+            },
+            {
+                "display_type": 3,
+                "lid": 61,
+                "count": 12,
+                "sort": 70,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/f8\/55\/f80f75b9dbb8e4608c088cd5e8d0c855.png",
+                "name": "C++",
+                "es_icon": "",
+                "pid": 3
+            },
+            {
+                "display_type": 3,
+                "lid": 65,
+                "count": 0,
+                "sort": 52,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/b5\/be\/b556c073350297593f07675aa863e5be.png",
+                "name": ".NET",
+                "es_icon": "",
+                "pid": 3
+            },
+            {
+                "display_type": 3,
+                "lid": 70,
+                "count": 25,
+                "sort": 54,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/a9\/79\/a9039f9bc495675893a2068c6543b779.png",
+                "name": "可视化",
+                "es_icon": "",
+                "pid": 5
+            },
+            {
+                "display_type": 1,
+                "lid": 75,
+                "count": 9,
+                "sort": 34,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/73\/38\/73fb63638b63978f0d4973f05b27b938.png",
+                "name": "算法",
+                "es_icon": "",
+                "pid": 9
+            },
+            {
+                "display_type": 1,
+                "lid": 76,
+                "count": 0,
+                "sort": 32,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/73\/38\/73fb63638b63978f0d4973f05b27b938.png",
+                "name": "网络",
+                "es_icon": "",
+                "pid": 9
+            },
+            {
+                "display_type": 1,
+                "lid": 77,
+                "count": 6,
+                "sort": 18,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/59\/de\/59716bcd9f348e1dfc045f3e4060abde.png",
+                "name": "工具",
+                "es_icon": "",
+                "pid": 9
+            },
+            {
+                "display_type": 3,
+                "lid": 78,
+                "count": 1,
+                "sort": 30,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/87\/6f\/87cd4a4400d2418ab6ee31f54b748f6f.png",
+                "name": "数据库",
+                "es_icon": "",
+                "pid": 9
+            },
+            {
+                "display_type": 1,
+                "lid": 79,
+                "count": 11,
+                "sort": 20,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/aa\/2d\/aa59e59beeyy8a070d40db6d27079c2d.png",
+                "name": "操作系统",
+                "es_icon": "",
+                "pid": 9
+            },
+            {
+                "display_type": 3,
+                "lid": 80,
+                "count": 6,
+                "sort": 22,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/41\/54\/4135b742a47824a67ba2b2e67c6ae054.png",
+                "name": "编译原理",
+                "es_icon": "",
+                "pid": 9
+            },
+            {
+                "display_type": 3,
+                "lid": 82,
+                "count": 4,
+                "sort": 26,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/b2\/97\/b2cb51bcd046ffa69yya033224888197.png",
+                "name": "数学",
+                "es_icon": "",
+                "pid": 9
+            },
+            {
+                "display_type": 3,
+                "lid": 83,
+                "count": 4,
+                "sort": 28,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/3d\/0d\/3def0d3bac27e1a6e2a13cc1b05aac0d.png",
+                "name": "组成原理",
+                "es_icon": "",
+                "pid": 9
+            },
+            {
+                "display_type": 3,
+                "lid": 102,
+                "count": 61,
+                "sort": 62,
+                "icon": "",
+                "name": "大模型",
+                "es_icon": "",
+                "pid": 101
+            },
+            {
+                "display_type": 3,
+                "lid": 101,
+                "count": 282,
+                "sort": 98,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/21\/4a\/2138481ba965774c9118097f4a2cca4a.png",
+                "name": "人工智能",
+                "es_icon": "",
+                "pid": 0
+            },
+            {
+                "display_type": 1,
+                "lid": 98,
+                "count": 9,
+                "sort": 68,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/8y\/75\/8yyb33a215a3d2e3382fb8200f648a75.png",
+                "name": "Rust",
+                "es_icon": "",
+                "pid": 3
+            },
+            {
+                "display_type": 3,
+                "lid": 103,
+                "count": 11,
+                "sort": 60,
+                "icon": "",
+                "name": "多模态",
+                "es_icon": "",
+                "pid": 101
+            },
+            {
+                "display_type": 3,
+                "lid": 104,
+                "count": 29,
+                "sort": 58,
+                "icon": "",
+                "name": "Agent",
+                "es_icon": "",
+                "pid": 101
+            },
+            {
+                "display_type": 3,
+                "lid": 105,
+                "count": 13,
+                "sort": 56,
+                "icon": "",
+                "name": "RAG",
+                "es_icon": "",
+                "pid": 101
+            },
+            {
+                "display_type": 3,
+                "lid": 106,
+                "count": 23,
+                "sort": 54,
+                "icon": "",
+                "name": "NLP",
+                "es_icon": "",
+                "pid": 101
+            },
+            {
+                "display_type": 3,
+                "lid": 107,
+                "count": 70,
+                "sort": 52,
+                "icon": "",
+                "name": "机器学习",
+                "es_icon": "",
+                "pid": 101
+            },
+            {
+                "display_type": 3,
+                "lid": 108,
+                "count": 24,
+                "sort": 50,
+                "icon": "",
+                "name": "深度学习",
+                "es_icon": "",
+                "pid": 101
+            },
+            {
+                "display_type": 3,
+                "lid": 109,
+                "count": 41,
+                "sort": 48,
+                "icon": "",
+                "name": "AI 算法",
+                "es_icon": "",
+                "pid": 101
+            },
+            {
+                "display_type": 3,
+                "lid": 110,
+                "count": 57,
+                "sort": 46,
+                "icon": "",
+                "name": "AIGC 应用",
+                "es_icon": "",
+                "pid": 101
+            },
+            {
+                "display_type": 3,
+                "lid": 111,
+                "count": 6,
+                "sort": 44,
+                "icon": "",
+                "name": "提示词工程",
+                "es_icon": "",
+                "pid": 101
+            },
+            {
+                "display_type": 3,
+                "lid": 112,
+                "count": 8,
+                "sort": 42,
+                "icon": "",
+                "name": "计算机视觉",
+                "es_icon": "",
+                "pid": 101
+            },
+            {
+                "display_type": 3,
+                "lid": 113,
+                "count": 3,
+                "sort": 40,
+                "icon": "",
+                "name": "智能编码",
+                "es_icon": "",
+                "pid": 101
+            },
+            {
+                "display_type": 3,
+                "lid": 114,
+                "count": 2,
+                "sort": 38,
+                "icon": "",
+                "name": "Spark",
+                "es_icon": "",
+                "pid": 101
+            },
+            {
+                "display_type": 3,
+                "lid": 115,
+                "count": 0,
+                "sort": 36,
+                "icon": "",
+                "name": "Flink",
+                "es_icon": "",
+                "pid": 101
+            },
+            {
+                "display_type": 3,
+                "lid": 116,
+                "count": 2,
+                "sort": 34,
+                "icon": "",
+                "name": "PyTorch",
+                "es_icon": "",
+                "pid": 101
+            },
+            {
+                "display_type": 3,
+                "lid": 117,
+                "count": 1,
+                "sort": 32,
+                "icon": "",
+                "name": "LangChain",
+                "es_icon": "",
+                "pid": 101
+            },
+            {
+                "display_type": 3,
+                "lid": 118,
+                "count": 3,
+                "sort": 72,
+                "icon": "",
+                "name": "C 语言",
+                "es_icon": "",
+                "pid": 3
+            },
+            {
+                "display_type": 3,
+                "lid": 119,
+                "count": 0,
+                "sort": 50,
+                "icon": "",
+                "name": "Spring",
+                "es_icon": "",
+                "pid": 3
+            },
+            {
+                "display_type": 3,
+                "lid": 120,
+                "count": 1,
+                "sort": 46,
+                "icon": "",
+                "name": "Web 开发",
+                "es_icon": "",
+                "pid": 3
+            },
+            {
+                "display_type": 3,
+                "lid": 121,
+                "count": 5,
+                "sort": 44,
+                "icon": "",
+                "name": "缓存",
+                "es_icon": "",
+                "pid": 3
+            },
+            {
+                "display_type": 3,
+                "lid": 122,
+                "count": 11,
+                "sort": 42,
+                "icon": "",
+                "name": "容器",
+                "es_icon": "",
+                "pid": 3
+            },
+            {
+                "display_type": 3,
+                "lid": 123,
+                "count": 120,
+                "sort": 94,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/21\/4a\/2138481ba965774c9118097f4a2cca4a.png",
+                "name": "大数据",
+                "es_icon": "",
+                "pid": 0
+            },
+            {
+                "display_type": 3,
+                "lid": 124,
+                "count": 1,
+                "sort": 26,
+                "icon": "",
+                "name": "数据采集",
+                "es_icon": "",
+                "pid": 123
+            },
+            {
+                "display_type": 3,
+                "lid": 125,
+                "count": 2,
+                "sort": 24,
+                "icon": "",
+                "name": "数据存储",
+                "es_icon": "",
+                "pid": 123
+            },
+            {
+                "display_type": 3,
+                "lid": 126,
+                "count": 7,
+                "sort": 22,
+                "icon": "",
+                "name": "数据处理",
+                "es_icon": "",
+                "pid": 123
+            },
+            {
+                "display_type": 3,
+                "lid": 127,
+                "count": 10,
+                "sort": 20,
+                "icon": "",
+                "name": "数据分析",
+                "es_icon": "",
+                "pid": 123
+            },
+            {
+                "display_type": 3,
+                "lid": 128,
+                "count": 0,
+                "sort": 18,
+                "icon": "",
+                "name": "数据集成",
+                "es_icon": "",
+                "pid": 123
+            },
+            {
+                "display_type": 3,
+                "lid": 129,
+                "count": 20,
+                "sort": 16,
+                "icon": "",
+                "name": "推荐系统",
+                "es_icon": "",
+                "pid": 123
+            },
+            {
+                "display_type": 3,
+                "lid": 130,
+                "count": 16,
+                "sort": 14,
+                "icon": "",
+                "name": "云计算",
+                "es_icon": "",
+                "pid": 123
+            },
+            {
+                "display_type": 3,
+                "lid": 131,
+                "count": 34,
+                "sort": 92,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/21\/4a\/2138481ba965774c9118097f4a2cca4a.png",
+                "name": "安全",
+                "es_icon": "",
+                "pid": 0
+            },
+            {
+                "display_type": 3,
+                "lid": 132,
+                "count": 4,
+                "sort": 14,
+                "icon": "",
+                "name": "安全攻防",
+                "es_icon": "",
+                "pid": 131
+            },
+            {
+                "display_type": 3,
+                "lid": 133,
+                "count": 3,
+                "sort": 12,
+                "icon": "",
+                "name": "网络安全",
+                "es_icon": "",
+                "pid": 131
+            },
+            {
+                "display_type": 3,
+                "lid": 134,
+                "count": 2,
+                "sort": 10,
+                "icon": "",
+                "name": "漏洞挖掘",
+                "es_icon": "",
+                "pid": 131
+            },
+            {
+                "display_type": 3,
+                "lid": 135,
+                "count": 10,
+                "sort": 8,
+                "icon": "",
+                "name": "数据安全",
+                "es_icon": "",
+                "pid": 131
+            },
+            {
+                "display_type": 3,
+                "lid": 136,
+                "count": 17,
+                "sort": 24,
+                "icon": "",
+                "name": "代码基础",
+                "es_icon": "",
+                "pid": 9
+            },
+            {
+                "display_type": 3,
+                "lid": 137,
+                "count": 12,
+                "sort": 56,
+                "icon": "",
+                "name": "Vue",
+                "es_icon": "",
+                "pid": 5
+            },
+            {
+                "display_type": 3,
+                "lid": 138,
+                "count": 3,
+                "sort": 52,
+                "icon": "",
+                "name": "Flutter",
+                "es_icon": "",
+                "pid": 5
+            },
+            {
+                "display_type": 3,
+                "lid": 139,
+                "count": 0,
+                "sort": 50,
+                "icon": "",
+                "name": "React Native",
+                "es_icon": "",
+                "pid": 5
+            },
+            {
+                "display_type": 3,
+                "lid": 140,
+                "count": 9,
+                "sort": 48,
+                "icon": "",
+                "name": "React 框架",
+                "es_icon": "",
+                "pid": 5
+            },
+            {
+                "display_type": 3,
+                "lid": 141,
+                "count": 5,
+                "sort": 46,
+                "icon": "",
+                "name": "WebAssembly",
+                "es_icon": "",
+                "pid": 5
+            },
+            {
+                "display_type": 3,
+                "lid": 142,
+                "count": 11,
+                "sort": 44,
+                "icon": "",
+                "name": "小程序",
+                "es_icon": "",
+                "pid": 5
+            },
+            {
+                "display_type": 3,
+                "lid": 143,
+                "count": 1,
+                "sort": 42,
+                "icon": "",
+                "name": "低代码",
+                "es_icon": "",
+                "pid": 5
+            },
+            {
+                "display_type": 3,
+                "lid": 144,
+                "count": 2,
+                "sort": 36,
+                "icon": "",
+                "name": "SRE",
+                "es_icon": "",
+                "pid": 6
+            },
+            {
+                "display_type": 3,
+                "lid": 145,
+                "count": 8,
+                "sort": 22,
+                "icon": "",
+                "name": "AIOps",
+                "es_icon": "",
+                "pid": 6
+            },
+            {
+                "display_type": 3,
+                "lid": 146,
+                "count": 161,
+                "sort": 84,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/21\/4a\/2138481ba965774c9118097f4a2cca4a.png",
+                "name": "技术领导力",
+                "es_icon": "",
+                "pid": 0
+            },
+            {
+                "display_type": 3,
+                "lid": 147,
+                "count": 27,
+                "sort": 30,
+                "icon": "",
+                "name": "面试求职",
+                "es_icon": "",
+                "pid": 146
+            },
+            {
+                "display_type": 3,
+                "lid": 148,
+                "count": 13,
+                "sort": 28,
+                "icon": "",
+                "name": "升职加薪",
+                "es_icon": "",
+                "pid": 146
+            },
+            {
+                "display_type": 3,
+                "lid": 149,
+                "count": 26,
+                "sort": 26,
+                "icon": "",
+                "name": "职业规划",
+                "es_icon": "",
+                "pid": 146
+            },
+            {
+                "display_type": 3,
+                "lid": 150,
+                "count": 36,
+                "sort": 24,
+                "icon": "",
+                "name": "研发效能",
+                "es_icon": "",
+                "pid": 146
+            },
+            {
+                "display_type": 3,
+                "lid": 151,
+                "count": 65,
+                "sort": 22,
+                "icon": "",
+                "name": "团队管理",
+                "es_icon": "",
+                "pid": 146
+            },
+            {
+                "display_type": 3,
+                "lid": 152,
+                "count": 14,
+                "sort": 20,
+                "icon": "",
+                "name": "项目管理",
+                "es_icon": "",
+                "pid": 146
+            },
+            {
+                "display_type": 3,
+                "lid": 153,
+                "count": 6,
+                "sort": 18,
+                "icon": "",
+                "name": "管理工具",
+                "es_icon": "",
+                "pid": 146
+            },
+            {
+                "display_type": 3,
+                "lid": 154,
+                "count": 11,
+                "sort": 16,
+                "icon": "",
+                "name": "数字化转型",
+                "es_icon": "",
+                "pid": 146
+            },
+            {
+                "display_type": 3,
+                "lid": 155,
+                "count": 59,
+                "sort": 82,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/21\/4a\/2138481ba965774c9118097f4a2cca4a.png",
+                "name": "产品\/增长",
+                "es_icon": "",
+                "pid": 0
+            },
+            {
+                "display_type": 3,
+                "lid": 156,
+                "count": 20,
+                "sort": 26,
+                "icon": "",
+                "name": "产品经理",
+                "es_icon": "",
+                "pid": 155
+            },
+            {
+                "display_type": 3,
+                "lid": 157,
+                "count": 2,
+                "sort": 24,
+                "icon": "",
+                "name": "商业思维",
+                "es_icon": "",
+                "pid": 155
+            },
+            {
+                "display_type": 3,
+                "lid": 158,
+                "count": 18,
+                "sort": 22,
+                "icon": "",
+                "name": "产品创新",
+                "es_icon": "",
+                "pid": 155
+            },
+            {
+                "display_type": 3,
+                "lid": 159,
+                "count": 17,
+                "sort": 20,
+                "icon": "",
+                "name": "增长",
+                "es_icon": "",
+                "pid": 155
+            },
+            {
+                "display_type": 3,
+                "lid": 160,
+                "count": 13,
+                "sort": 18,
+                "icon": "",
+                "name": "运营",
+                "es_icon": "",
+                "pid": 155
+            },
+            {
+                "display_type": 3,
+                "lid": 161,
+                "count": 8,
+                "sort": 16,
+                "icon": "",
+                "name": "市场",
+                "es_icon": "",
+                "pid": 155
+            },
+            {
+                "display_type": 3,
+                "lid": 162,
+                "count": 7,
+                "sort": 14,
+                "icon": "",
+                "name": "体验设计",
+                "es_icon": "",
+                "pid": 155
+            },
+            {
+                "display_type": 3,
+                "lid": 163,
+                "count": 51,
+                "sort": 80,
+                "icon": "https:\/\/static001.geekbang.org\/resource\/image\/21\/4a\/2138481ba965774c9118097f4a2cca4a.png",
+                "name": "多元成长",
+                "es_icon": "",
+                "pid": 0
+            },
+            {
+                "display_type": 3,
+                "lid": 164,
+                "count": 5,
+                "sort": 50,
+                "icon": "",
+                "name": "学习方法",
+                "es_icon": "",
+                "pid": 163
+            },
+            {
+                "display_type": 3,
+                "lid": 165,
+                "count": 1,
+                "sort": 48,
+                "icon": "",
+                "name": "短视频",
+                "es_icon": "",
+                "pid": 163
+            },
+            {
+                "display_type": 3,
+                "lid": 166,
+                "count": 1,
+                "sort": 46,
+                "icon": "",
+                "name": "英语",
+                "es_icon": "",
+                "pid": 163
+            },
+            {
+                "display_type": 3,
+                "lid": 167,
+                "count": 8,
+                "sort": 44,
+                "icon": "",
+                "name": "写作",
+                "es_icon": "",
+                "pid": 163
+            },
+            {
+                "display_type": 3,
+                "lid": 168,
+                "count": 3,
+                "sort": 42,
+                "icon": "",
+                "name": "摄影",
+                "es_icon": "",
+                "pid": 163
+            },
+            {
+                "display_type": 3,
+                "lid": 169,
+                "count": 1,
+                "sort": 40,
+                "icon": "",
+                "name": "音乐",
+                "es_icon": "",
+                "pid": 163
+            },
+            {
+                "display_type": 3,
+                "lid": 170,
+                "count": 1,
+                "sort": 38,
+                "icon": "",
+                "name": "跑步",
+                "es_icon": "",
+                "pid": 163
+            },
+            {
+                "display_type": 3,
+                "lid": 171,
+                "count": 1,
+                "sort": 36,
+                "icon": "",
+                "name": "理财",
+                "es_icon": "",
+                "pid": 163
+            },
+            {
+                "display_type": 3,
+                "lid": 172,
+                "count": 1,
+                "sort": 34,
+                "icon": "",
+                "name": "法律",
+                "es_icon": "",
+                "pid": 163
+            },
+            {
+                "display_type": 3,
+                "lid": 173,
+                "count": 1,
+                "sort": 32,
+                "icon": "",
+                "name": "视觉笔记",
+                "es_icon": "",
+                "pid": 163
+            },
+            {
+                "display_type": 3,
+                "lid": 174,
+                "count": 1,
+                "sort": 30,
+                "icon": "",
+                "name": "美术鉴赏",
+                "es_icon": "",
+                "pid": 163
+            },
+            {
+                "display_type": 3,
+                "lid": 175,
+                "count": 1,
+                "sort": 28,
+                "icon": "",
+                "name": "恋爱",
+                "es_icon": "",
+                "pid": 163
+            },
+            {
+                "display_type": 3,
+                "lid": 176,
+                "count": 14,
+                "sort": 40,
+                "icon": "",
+                "name": "云原生",
+                "es_icon": "",
+                "pid": 3
+            },
+            {
+                "display_type": 3,
+                "lid": 177,
+                "count": 4,
+                "sort": 26,
+                "icon": "",
+                "name": "创业",
+                "es_icon": "",
+                "pid": 163
+            }
+        ]
+    },
+    "code": 0
+}是分类标签数据: lid: 是标签id,sort: 排序数值越大越靠前, name: 标签名, pid:是父级标签的lid  pid=0的为一级分类(方向), 否则为二级分类(分类), 按照这个分类方法为现有课程(org_courses 目录下)进行分类, 将分类结果保存在 课程目录下 intro.md 课程信息 下面, 格式为: - **课程分类**: 3, 14, 20, 10215, 10221 
+并重新涉及搜索功能 去掉关键词搜索 改为方向,分类
+
+{
+    "product_id": 100034101,
+    "with_recommend_article": true
+}

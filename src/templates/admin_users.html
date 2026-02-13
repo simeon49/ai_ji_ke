@@ -1,0 +1,393 @@
+{% extends "base.html" %}
+
+{% block title %}用户管理 - AI极客{% endblock %}
+
+{% block extra_head %}
+<style>
+    .users-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .users-table th {
+        background: #e8e0d5;
+        padding: 0.75rem 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: #1a1a2e;
+    }
+    .users-table td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #d4c5b0;
+    }
+    .users-table tr:hover {
+        background: #f5f0e8;
+    }
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        vertical-align: middle;
+        margin-right: 0.5rem;
+    }
+    .user-info {
+        display: flex;
+        align-items: center;
+    }
+    .role-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .role-admin {
+        background: #8b7355;
+        color: white;
+    }
+    .role-user {
+        background: #d4c5b0;
+        color: #3d2e17;
+    }
+    .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .status-active {
+        background: #4a7c59;
+        color: white;
+    }
+    .status-inactive {
+        background: #8b8b8b;
+        color: white;
+    }
+    .btn-warning {
+        background: #c9a227;
+        color: white;
+    }
+    .btn-success {
+        background: #4a7c59;
+        color: white;
+    }
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+    .modal-overlay.active {
+        display: flex;
+    }
+    .modal {
+        background: #fffbf5;
+        border-radius: 16px;
+        padding: 2rem;
+        max-width: 400px;
+        width: 90%;
+    }
+    .modal-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    .modal-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+    .modal-buttons .btn {
+        flex: 1;
+    }
+    /* 手机端表格横向滚动 */
+    @media (max-width: 768px) {
+        .users-table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .users-table {
+            min-width: 600px;
+        }
+        .action-buttons {
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .action-buttons .btn {
+            width: 100%;
+            padding: 0.4rem 0.5rem;
+            font-size: 0.75rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 class="card-title">用户管理</h2>
+    <div class="users-table-wrapper">
+        <table class="users-table">
+        <thead>
+            <tr>
+                <th>用户</th>
+                <th>角色</th>
+                <th>状态</th>
+                <th>注册时间</th>
+                <th>最后登录</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr data-username="{{ user.username }}">
+                <td>
+                    <div class="user-info">
+                        <img src="/static/avatars/{{ user.avatar }}" class="user-avatar" alt="Avatar">
+                        <div>
+                            <div style="font-weight: 600;">{{ user.nickname }}</div>
+                            <div style="font-size: 0.875rem; color: #5d4e37;">{{ user.username }}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <span class="role-badge {% if user.role.value == 'admin' %}role-admin{% else %}role-user{% endif %}">
+                        {% if user.role.value == 'admin' %}超管{% else %}普通用户{% endif %}
+                    </span>
+                </td>
+                <td>
+                    <span class="status-badge {% if user.is_active %}status-active{% else %}status-inactive{% endif %}">
+                        {% if user.is_active %}启用{% else %}禁用{% endif %}
+                    </span>
+                </td>
+                <td class="created-at" data-time="{{ user.created_at or '' }}">{{ user.created_at[:19] if user.created_at else '-' }}</td>
+                <td class="last-login" data-time="{{ user.last_login or '' }}">{{ user.last_login[:19] if user.last_login else '-' }}</td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn btn-sm"
+                                onclick="changeRole('{{ user.username }}', '{{ user.role.value }}')"
+                                {% if user.role.value == 'admin' %}disabled style="opacity: 0.5; cursor: not-allowed;"{% endif %}>
+                            切换角色
+                        </button>
+                        <button class="btn btn-sm"
+                                onclick="resetPassword('{{ user.username }}')"
+                                {% if user.role.value == 'admin' %}disabled style="opacity: 0.5; cursor: not-allowed;"{% endif %}>
+                            重置密码
+                        </button>
+                        <button class="btn btn-sm {% if user.is_active %}btn-warning{% else %}btn-success{% endif %}"
+                                onclick="toggleStatus('{{ user.username }}')"
+                                {% if user.role.value == 'admin' %}disabled style="opacity: 0.5; cursor: not-allowed;"{% endif %}>
+                            {% if user.is_active %}禁用{% else %}启用{% endif %}
+                        </button>
+                        <button class="btn btn-sm btn-danger"
+                                onclick="deleteUser('{{ user.username }}')"
+                                {% if user.role.value == 'admin' %}disabled style="opacity: 0.5; cursor: not-allowed;"{% endif %}>
+                            删除
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>
+
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal">
+        <h3 class="modal-title">确认删除</h3>
+        <p>确定要删除用户 <strong id="deleteUsername"></strong> 吗？</p>
+        <div class="modal-buttons">
+            <button class="btn" onclick="closeModal('deleteModal')">取消</button>
+            <button class="btn btn-danger" onclick="confirmDelete()">删除</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="roleModal">
+    <div class="modal">
+        <h3 class="modal-title">切换角色</h3>
+        <p>将用户 <strong id="roleUsername"></strong> 的角色切换为：</p>
+        <form id="roleForm" method="post">
+            <input type="hidden" name="username" id="roleUsernameInput">
+            <div class="form-group">
+                <select name="role" class="form-group input" style="width: 100%; padding: 0.75rem; border: 1px solid #d4c5b0; border-radius: 10px;">
+                    <option value="user">普通用户</option>
+                    <option value="admin">超管</option>
+                </select>
+            </div>
+        </form>
+        <div class="modal-buttons">
+            <button class="btn" onclick="closeModal('roleModal')">取消</button>
+            <button class="btn btn-primary" onclick="confirmRoleChange()">确定</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="resetPasswordModal">
+    <div class="modal">
+        <h3 class="modal-title">重置密码</h3>
+        <p>重置用户 <strong id="resetPasswordUsername"></strong> 的密码：</p>
+        <form id="resetPasswordForm" method="post">
+            <input type="hidden" name="username" id="resetPasswordUsernameInput">
+            <div class="form-group">
+                <input type="text" name="password" id="resetPasswordInput" class="form-group input" 
+                       placeholder="默认: pwd@12345" 
+                       style="width: 100%; padding: 0.75rem; border: 1px solid #d4c5b0; border-radius: 10px;">
+            </div>
+        </form>
+        <div class="modal-buttons">
+            <button class="btn" onclick="closeModal('resetPasswordModal')">取消</button>
+            <button class="btn btn-primary" onclick="confirmResetPassword()">确定</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    let deleteTarget = null;
+    let roleTarget = null;
+    let resetPasswordTarget = null;
+
+    // 页面加载完成后转换时间（使用全局TimeUtils）
+    document.addEventListener('DOMContentLoaded', function() {
+        // 转换用户管理页面的时间字段
+        document.querySelectorAll('.created-at').forEach(function(el) {
+            const time = el.getAttribute('data-time');
+            if (time) {
+                el.textContent = TimeUtils.toChinaTime(time, 'full');
+            }
+        });
+        document.querySelectorAll('.last-login').forEach(function(el) {
+            const time = el.getAttribute('data-time');
+            if (time) {
+                el.textContent = TimeUtils.toChinaTime(time, 'full');
+            }
+        });
+    });
+
+    function deleteUser(username) {
+        deleteTarget = username;
+        document.getElementById('deleteUsername').textContent = username;
+        document.getElementById('deleteModal').classList.add('active');
+    }
+
+    function confirmDelete() {
+        if (!deleteTarget) return;
+
+        fetch(`/admin/users/${deleteTarget}`, {
+            method: 'DELETE'
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('删除失败');
+            }
+        })
+        .catch(error => {
+            alert('删除失败: ' + error);
+        });
+    }
+
+    function changeRole(username, currentRole) {
+        roleTarget = username;
+        document.getElementById('roleUsername').textContent = username;
+        document.getElementById('roleUsernameInput').value = username;
+        document.querySelector('#roleForm select').value = currentRole === 'admin' ? 'user' : 'admin';
+        document.getElementById('roleModal').classList.add('active');
+    }
+
+    function confirmRoleChange() {
+        if (!roleTarget) return;
+
+        const form = document.getElementById('roleForm');
+        const formData = new FormData(form);
+
+        fetch(`/admin/users/${roleTarget}/role`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('切换角色失败');
+            }
+        })
+        .catch(error => {
+            alert('切换角色失败: ' + error);
+        });
+    }
+
+    function resetPassword(username) {
+        resetPasswordTarget = username;
+        document.getElementById('resetPasswordUsername').textContent = username;
+        document.getElementById('resetPasswordUsernameInput').value = username;
+        document.getElementById('resetPasswordInput').value = '';
+        document.getElementById('resetPasswordModal').classList.add('active');
+    }
+
+    function confirmResetPassword() {
+        if (!resetPasswordTarget) return;
+
+        const form = document.getElementById('resetPasswordForm');
+        const formData = new FormData(form);
+        const password = formData.get('password') || 'pwd@12345';
+        formData.set('password', password);
+
+        fetch(`/admin/users/${resetPasswordTarget}/reset-password`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('密码已重置为: ' + password);
+                closeModal('resetPasswordModal');
+            } else {
+                alert('重置密码失败');
+            }
+        })
+        .catch(error => {
+            alert('重置密码失败: ' + error);
+        });
+    }
+
+    function toggleStatus(username) {
+        if (!confirm(`确定要${event.target.textContent.trim()}用户 ${username} 吗？`)) {
+            return;
+        }
+
+        fetch(`/admin/users/${username}/toggle-status`, {
+            method: 'POST'
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('操作失败');
+            }
+        })
+        .catch(error => {
+            alert('操作失败: ' + error);
+        });
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove('active');
+        deleteTarget = null;
+        roleTarget = null;
+        resetPasswordTarget = null;
+    }
+</script>
+{% endblock %}
