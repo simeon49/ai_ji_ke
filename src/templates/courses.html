@@ -290,9 +290,6 @@
         <select class="filter-select" id="directionFilter">
             <option value="">全部方向</option>
         </select>
-        <select class="filter-select" id="categoryFilter" disabled>
-            <option value="">全部分类</option>
-        </select>
     </div>
 
     <div class="results-count" id="resultsCount"></div>
@@ -309,8 +306,7 @@ let allCourses = [];
 let allDirections = [];
 let currentFilter = {
     search: '',
-    direction: '',
-    category: ''
+    direction: ''
 };
 
 // 加载课程数据
@@ -335,32 +331,6 @@ function renderDirections() {
     directionSelect.innerHTML = '<option value="">全部方向</option>' + options;
 }
 
-// 更新分类筛选器选项
-function updateCategoryOptions(directionId) {
-    const categorySelect = document.getElementById('categoryFilter');
-
-    if (!directionId) {
-        categorySelect.innerHTML = '<option value="">全部分类</option>';
-        categorySelect.disabled = true;
-        return;
-    }
-
-    // 从全局标签配置获取分类（通过API或预加载）
-    fetch(`/api/labels/categories?direction=${directionId}`)
-        .then(res => res.json())
-        .then(data => {
-            const categories = data.categories || [];
-            const options = categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-            categorySelect.innerHTML = '<option value="">全部分类</option>' + options;
-            categorySelect.disabled = false;
-        })
-        .catch(err => {
-            console.error('加载分类失败:', err);
-            categorySelect.innerHTML = '<option value="">全部分类</option>';
-            categorySelect.disabled = true;
-        });
-}
-
 // 过滤和渲染课程
 function filterAndRender() {
     let filtered = allCourses;
@@ -379,13 +349,6 @@ function filterAndRender() {
     if (currentFilter.direction) {
         filtered = filtered.filter(c =>
             c.labels && c.labels.direction_id === currentFilter.direction
-        );
-    }
-
-    // 分类过滤
-    if (currentFilter.category) {
-        filtered = filtered.filter(c =>
-            c.labels && c.labels.category_ids && c.labels.category_ids.includes(currentFilter.category)
         );
     }
 
@@ -486,16 +449,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const directionFilter = document.getElementById('directionFilter');
     directionFilter.addEventListener('change', (e) => {
         currentFilter.direction = e.target.value;
-        currentFilter.category = ''; // 重置分类
-        document.getElementById('categoryFilter').value = '';
-        updateCategoryOptions(e.target.value);
-        filterAndRender();
-    });
-
-    // 分类过滤
-    const categoryFilter = document.getElementById('categoryFilter');
-    categoryFilter.addEventListener('change', (e) => {
-        currentFilter.category = e.target.value;
         filterAndRender();
     });
 });

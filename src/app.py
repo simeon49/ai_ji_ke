@@ -888,8 +888,7 @@ async def list_courses_api(
     search: str = "",
     status: str = "",
     keyword: str = "",
-    direction: str = "",
-    category: str = ""
+    direction: str = ""
 ):
     """获取课程列表API，支持搜索和筛选"""
     output_dirs = [Path("./org_courses")]
@@ -936,13 +935,6 @@ async def list_courses_api(
             if c.get("labels") and c["labels"].get("direction_id") == direction
         ]
 
-    # 分类过滤
-    if category:
-        courses = [
-            c for c in courses
-            if c.get("labels") and category in c["labels"].get("category_ids", [])
-        ]
-
     # 获取所有分类（关键词）
     all_keywords = set()
     for course in courses:
@@ -959,16 +951,6 @@ async def list_courses_api(
         "directions": directions,
         "total": len(courses)
     }
-
-
-@app.get("/api/labels/categories")
-async def get_categories_by_direction_api(
-    direction: str,
-    current_user: User = require_auth()
-):
-    """获取指定方向下的分类列表"""
-    categories = label_manager.get_categories_by_direction(direction)
-    return {"categories": categories}
 
 
 @app.get("/api/my-courses")
