@@ -724,6 +724,9 @@ def _parse_course_info(course_dir: Path) -> dict:
         "total_lessons": 0,
         "downloaded_lessons": 0,
         "labels": None,
+        "utime": 0,
+        "utime_formatted": "",
+        "sub_count": 0,
     }
 
     name_parts = course_dir.name.split("__", 1)
@@ -813,11 +816,13 @@ def _parse_column_info_json(course_dir: Path) -> dict | None:
     - subtitle: 课程副标题
     - unit: 课程讲数
     - is_finish: 是否已完结
+    - utime: 课程更新时间 (Unix时间戳)
     - author.name: 讲师名
     - author.intro: 讲师简介
     - author.brief: 讲师详细介绍
     - seo.keywords: 关键词列表
     - cover.square: 课程封面 URL
+    - extra.sub.count: 订阅人数（热度）
     - extra.modules: 课程模块（包含"你将获得"、"课程介绍"等）
     """
     column_info_file = course_dir / ".column_info.json"
@@ -843,6 +848,11 @@ def _parse_column_info_json(course_dir: Path) -> dict | None:
         if "is_finish" in data:
             info["is_finished"] = data["is_finish"]
         
+        # 课程更新时间 (Unix 时间戳 -> 中国时区字符串)
+        if "utime" in data:
+            info["utime"] = data["utime"]  # 保留原始时间戳用于排序
+            info["utime_formatted"] = _format_timestamp_to_china(data["utime"])
+        
         # 讲师信息
         author = data.get("author", {})
         if "name" in author:
@@ -864,9 +874,25 @@ def _parse_column_info_json(course_dir: Path) -> dict | None:
         if "square" in cover:
             info["cover_url"] = cover["square"]
         
+        # 订阅人数（热度）
+        extra = data.get("extra", {})
+        sub = extra.get("sub", {})
+        if "count" in sub:
+            info["sub_count"] = sub["count"]
+        
         return info if info else None
     except Exception:
         return None
+
+
+def _format_timestamp_to_china(timestamp: int) -> str:
+    """将 Unix 时间戳转换为中国时区的日期时间字符串"""
+    from datetime import datetime, timezone, timedelta
+    
+    # 中国时区 UTC+8
+    china_tz = timezone(timedelta(hours=8))
+    dt = datetime.fromtimestamp(timestamp, tz=china_tz)
+    return dt.strftime("%Y-%m-%d %H:%M")
 
 
 def _parse_intro_md(content: str, course_dir: Path) -> dict:

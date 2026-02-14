@@ -167,6 +167,19 @@
     .author-meta-row {
         display: none;
     }
+    .course-extra-info {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        font-size: 0.65rem;
+        color: #94a3b8;
+        margin-bottom: 0.3rem;
+    }
+    .course-extra-info .extra-item {
+        display: flex;
+        align-items: center;
+        gap: 0.2rem;
+    }
     .course-progress {
         margin-top: 0.4rem;
     }
@@ -222,6 +235,7 @@
         .course-card {
             display: flex;
             border-radius: 10px;
+            align-items: center;
         }
         .course-cover-wrapper {
             width: 80px;
@@ -259,17 +273,35 @@
             gap: 0.25rem;
             font-size: 0.7rem;
             color: #475569;
-            margin-bottom: 0.25rem;
         }
         .course-meta {
             font-size: 0.65rem;
-            margin-bottom: 0.25rem;
         }
         .author-meta-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.2rem;
+            flex-wrap: nowrap;
+            gap: 0.5rem;
+        }
+        .author-meta-row .course-author {
+            flex-shrink: 1;
+            min-width: 0;
+            overflow: hidden;
+        }
+        .author-meta-row .course-author span:last-child {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .author-meta-row .course-meta {
+            flex-shrink: 0;
+            margin-bottom: 0;
+        }
+        .course-extra-info {
+            font-size: 0.6rem;
+            margin-bottom: 0.2rem;
         }
         .course-progress {
             margin-top: 0.25rem;
@@ -290,6 +322,11 @@
         <select class="filter-select" id="directionFilter">
             <option value="">全部方向</option>
         </select>
+        <select class="filter-select" id="sortSelect">
+            <option value="utime">更新时间</option>
+            <option value="sub_count">热度</option>
+            <option value="updated_at">爬取时间</option>
+        </select>
     </div>
 
     <div class="results-count" id="resultsCount"></div>
@@ -306,7 +343,8 @@ let allCourses = [];
 let allDirections = [];
 let currentFilter = {
     search: '',
-    direction: ''
+    direction: '',
+    sort: 'utime'
 };
 
 // 加载课程数据
@@ -352,7 +390,25 @@ function filterAndRender() {
         );
     }
 
+    // 排序
+    filtered = sortCourses(filtered, currentFilter.sort);
+
     renderCourses(filtered);
+}
+
+// 排序课程
+function sortCourses(courses, sortBy) {
+    return [...courses].sort((a, b) => {
+        switch (sortBy) {
+            case 'utime':
+                return (b.utime || 0) - (a.utime || 0);
+            case 'sub_count':
+                return (b.sub_count || 0) - (a.sub_count || 0);
+            case 'updated_at':
+            default:
+                return (b.updated_at || '').localeCompare(a.updated_at || '');
+        }
+    });
 }
 
 // 渲染课程列表
@@ -378,6 +434,13 @@ function renderCourses(courses) {
             ? `<span class="course-status status-in_progress">爬取中</span>`
             : '';
 
+        // 格式化热度数字
+        const formatSubCount = (count) => {
+            if (!count) return '';
+            if (count >= 10000) return (count / 10000).toFixed(1) + '万';
+            return count.toString();
+        };
+
         return `
         <a href="/courses/${course.path}" class="course-card">
             <div class="course-cover-wrapper">
@@ -391,7 +454,7 @@ function renderCourses(courses) {
                     </div>
                     <div class="course-overlay-meta">
                         ${course.unit ? `<span class="meta-item">📖 ${course.unit}</span>` : ''}
-                        ${course.learn_count ? `<span class="meta-item">👥 ${course.learn_count}人</span>` : ''}
+                        ${course.sub_count ? `<span class="meta-item">🔥 ${formatSubCount(course.sub_count)}</span>` : ''}
                     </div>
                 </div>
             </div>
@@ -414,8 +477,12 @@ function renderCourses(courses) {
 
                     <div class="course-meta">
                         ${course.unit ? `<span class="meta-item">📖 ${course.unit}</span>` : ''}
-                        ${course.learn_count ? `<span class="meta-item">👥 ${course.learn_count}人</span>` : ''}
+                        ${course.sub_count ? `<span class="meta-item">🔥 ${formatSubCount(course.sub_count)}</span>` : ''}
                     </div>
+                </div>
+
+                <div class="course-extra-info">
+                    ${course.utime_formatted ? `<span class="extra-item" title="课程更新时间">📅 ${course.utime_formatted}</span>` : ''}
                 </div>
 
                 ${course.total_lessons > 0 && course.downloaded_lessons != course.total_lessons ? `
@@ -449,6 +516,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const directionFilter = document.getElementById('directionFilter');
     directionFilter.addEventListener('change', (e) => {
         currentFilter.direction = e.target.value;
+        filterAndRender();
+    });
+
+    // 排序
+    const sortSelect = document.getElementById('sortSelect');
+    sortSelect.addEventListener('change', (e) => {
+        currentFilter.sort = e.target.value;
         filterAndRender();
     });
 });
