@@ -80,6 +80,33 @@ STATIC_DIR.mkdir(exist_ok=True)
 
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
+
+@app.middleware("http")
+async def add_cache_control_headers(request: Request, call_next):
+    """添加缓存控制头，防止 Nginx 缓存动态内容"""
+    response = await call_next(request)
+
+    # 静态资源允许缓存
+    if request.url.path.startswith("/static") or request.url.path.startswith("/course_files"):
+        # 静态文件可以缓存 1 天
+        response.headers["Cache-Control"] = "public, max-age=86400"
+        return response
+
+    # SSE 端点永不缓存
+    if "/events" in request.url.path:
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        return response
+
+    # API 响应和动态页面不缓存
+    if request.url.path.startswith("/api/") or request.url.path.startswith("/courses"):
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+
+    return response
+
 if STATIC_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
