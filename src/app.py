@@ -101,9 +101,14 @@ async def add_cache_control_headers(request: Request, call_next):
 
     # API 响应和动态页面不缓存
     if request.url.path.startswith("/api/") or request.url.path.startswith("/courses"):
-        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        # private: 告诉 Nginx 等代理服务器不要缓存此响应
+        # s-maxage=0: 强制代理服务器不缓存（即使忽略了 private）
+        response.headers["Cache-Control"] = "private, no-store, no-cache, must-revalidate, max-age=0, s-maxage=0"
         response.headers["Pragma"] = "no-cache"
         response.headers["Expires"] = "0"
+        # Vary: Cookie 让代理按 Cookie 区分缓存（不同用户不共享缓存）
+        # 这确保即使 Nginx 缓存，也会为每个用户/会话单独缓存
+        response.headers["Vary"] = "Cookie, Accept-Encoding"
 
     return response
 
